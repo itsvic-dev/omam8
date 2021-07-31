@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "chrono": "c",
+        "cmath": "c",
+        "functional": "c"
+    }
+}
