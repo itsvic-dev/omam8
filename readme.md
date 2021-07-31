@@ -1,4 +1,4 @@
-<img align="center" src="logo.png"/>
+<p align="center"><img src="logo.png"/></p>
 <h1 align="center">omam8</h1>
 <h2 align="center">an 8-bit processor architecture</h2>
 
