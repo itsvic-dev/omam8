@@ -11,7 +11,7 @@ you can find the specifications in the [spec.md file](spec.md)
 
 ## file rundown
 - `asm.py` - omam8 assembler
-- `emu.py` - omam8 emulator
+- `emu/` - omam8 emulator (written in C and SDL2, might not build on Windows - try under Cygwin)
 - `genimg.py` - oasm generator for displaying images in VRAM with RLE (requires Pillow)
 - `input.png` - required by `genimg.py`
 - `rle.oasm` - RLE routine used by `genimg.py`
