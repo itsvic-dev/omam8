@@ -2,7 +2,7 @@
 
 ## specs
 - little endian
-- drives a 240 x 160 black and white display
+- drives a 240 x 160 grayscale display
 
 ## memory layout
 ### MRAM - Main RAM
