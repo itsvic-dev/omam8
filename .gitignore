@@ -1,0 +1,5 @@
+*.oasm
+!rle.oasm
+*.png
+!logo.png
+*.bin

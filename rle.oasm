@@ -1,0 +1,70 @@
+; 0x0100 - start of RAM code
+; 0x0200 - inspected byte
+; 0x0201 - byte to write
+; 0x0202 - 0x0203 - current location in VRAM
+
+; load 0x00 from VRAM to 0x0200 in MRAM
+JMP .write_ram
+
+ram:
+    VRD 0x0000 0x0200
+    JMP .check
+
+write_ram:
+    MOV .ram 0x0100 ; VRD
+    MOV 0x0202 0x0101
+    MOV 0x0203 0x0102 ; current location in VRAM
+    MOV .ram+3 0x0103
+    MOV .ram+4 0x0104 ; 0x0200
+    MOV .ram+5 0x0105 ; JMP
+    MOV .ram+6 0x0106
+    MOV .ram+7 0x0107 ; .check
+
+    JMP 0x0100
+
+; check if the inspected byte is FF by adding 1 and JNZing
+check:
+    ADD %1 0x0200
+    JNZ .is_ff
+    JMP .write
+
+is_ff:
+    CLR
+    ; check again, but for the byte to write
+    ADD %1 0x0201
+    JNZ .2_is_ff
+    ; byte to write is 0x00, set it to 0xFF
+    MOV %0xFF 0x0201
+    JMP .write
+
+; byte to write is 0xFF, set it to 0x00
+2_is_ff:
+    CLR
+    MOV %0 0x0201
+    JMP .write
+
+2_ram:
+    VMOV 0x0201 0x0000
+    JMP .increment
+
+write:
+    MOV .2_ram 0x0100 ; VMOV
+    MOV .2_ram+1 0x0101
+    MOV .2_ram+2 0x0102 ; 0x0201
+    MOV 0x0202 0x0103
+    MOV 0x0203 0x0104 ; current location in VRAM
+    MOV .2_ram+5 0x0105 ; JMP
+    MOV .2_ram+6 0x0106
+    MOV .2_ram+7 0x0107 ; .increment
+
+    JMP 0x0100
+
+increment:
+    ADD %1 0x0202
+    JNZ .upper_increment
+    JMP .write_ram
+
+upper_increment:
+    CLR
+    ADD %1 0x0203
+    JMP .write_ram
