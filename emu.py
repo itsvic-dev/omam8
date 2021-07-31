@@ -170,6 +170,7 @@ if __name__ == "__main__":
     while True:
         try:
             execute()
-        except:
-            traceback.print_exc()
-            hlt()
+        except Exception as e:
+            if type(e) != SystemExit:
+                traceback.print_exc()
+                hlt()
