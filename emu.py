@@ -1,5 +1,6 @@
 import sys
 from inspect import signature
+import traceback
 
 
 # memory
@@ -167,4 +168,8 @@ if __name__ == "__main__":
     loadROM()
     print("Starting loop...")
     while True:
-        execute()
+        try:
+            execute()
+        except:
+            traceback.print_exc()
+            hlt()
