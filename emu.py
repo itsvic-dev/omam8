@@ -42,8 +42,8 @@ def add(x, y):
         return
     mram[y] = mram[x] + mram[y]
     if (mram[y] > 255):
-        remainder = mram[y] - 255
-        mram[y] = mram[y] - 256
+        remainder = mram[y] >> 0x8 & 0xff
+        mram[y] = mram[y] & 0xff
 
 def sub(x, y):
     if y > 0x7FFF:
