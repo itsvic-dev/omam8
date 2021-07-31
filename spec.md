@@ -36,7 +36,7 @@ Full size: `0x9600`
 
 `JZ x` (`0x02 0xXX`) - Jump to a 16-bit address in MRAM **if the remainder register is 0**
 
-`ADD x y` (`0x03 0xXX 0xYY`) - Add contents of `x` to contents of `y` (`x + y`)
+`ADD x y` (`0x03 0xXX 0xYY`) - Add contents of `x` to contents of `y` (`y + x`)
 
 `SUB x y` (`0x04 0xXX 0xYY`) - Subtract contents of `x` from contents of `y` (`y - x`)
 
