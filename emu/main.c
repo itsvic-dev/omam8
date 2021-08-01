@@ -132,7 +132,7 @@ int main(void) {
 
             switch (event.type) {
                 case SDL_QUIT:
-                printf("SDL2 quit detected, leaving.");
+                printf("SDL2 quit detected, leaving.\n");
                     quit = true;
                     break;
             }
