@@ -20,6 +20,9 @@ str_to_instruction = {
     "CLR": 0x0B,
     "AND": 0x0C,
     "VRD": 0x0D,
+    "LDA": 0x0E,
+    "STA": 0x0F,
+    "JEQ": 0x10,
     "HLT": 0xFF
 }
 

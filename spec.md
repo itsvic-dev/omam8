@@ -27,6 +27,7 @@ Full size: `0x9600`
 | Program counter | `0x8000` |
 | Remainder | `0x00` |
 | Stack pointer | `0x0000` |
+| A | `0x00` |
 
 
 ## instructions
@@ -57,5 +58,11 @@ Full size: `0x9600`
 `AND x y` (`0x0C 0xXX 0xYY`) - AND `x` and `y` together, storing the result in `y` (`y = x & y`)
 
 `VRD x y` (`0x0D 0xXX 0xYY`) - Move/copy contents of `x` in VRAM to address `y` in MRAM
+
+`LDA x` (`0x0E 0xXX`) - Load contents of `x` to the A register
+
+`STA x` (`0x0F 0xXX`) - Store contents of the A register in `x`
+
+`JEQ x y` (`0x10 0xXX 0xYY`) - Jump to `y` if contents in `x` are equal to the A register
 
 `HLT` (`0xFF`) - Halt the CPU

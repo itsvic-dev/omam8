@@ -4,6 +4,9 @@
 ; 0x0201 - byte to write
 ; 0x0202 - 0x0203 - current location in VRAM
 
+; load 0xFF to A for checking later on
+LDA %0xFF
+
 ; load 0x00 from VRAM to 0x0200 in MRAM
 JMP .write_ram
 
@@ -49,22 +52,18 @@ update_ram:
 
 ; check if the inspected byte is FF by adding 1 and JNZing
 check:
-    ADD %1 0x0200
-    JNZ .is_ff
+    JEQ 0x0200 .is_ff
     JMP .2_update_ram
 
 is_ff:
-    CLR
     ; check again, but for the byte to write
-    ADD %1 0x0201
-    JNZ .2_is_ff
+    JEQ 0x0201 .2_is_ff
     ; byte to write is 0x00, set it to 0xFF
     MOV %0xFF 0x0201
     JMP .2_update_ram
 
 ; byte to write is 0xFF, set it to 0x00
 2_is_ff:
-    CLR
     MOV %0 0x0201
     JMP .2_update_ram
 
