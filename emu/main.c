@@ -112,6 +112,7 @@ void hlt() {
 
 const int render_every = 1024;
 int render_counter = 0;
+bool quit = false;
 
 uint16_t get_16bit_from_mram(uint16_t addr) {
     uint8_t lower = mram[addr];
@@ -281,8 +282,9 @@ int main(void) {
 
         switch (event.type) {
             case SDL_QUIT:
-            printf("SDL2 quit detected, halting CPU.");
+            printf("SDL2 quit detected, halting CPU.\n");
                 cpu_active = false;
+                quit = true;
                 break;
         }
 
@@ -311,6 +313,20 @@ int main(void) {
     fclose(vramptr);
 
     printf("Done.\n");
+
+    if (!quit) {
+        printf("Waiting for user to close...\n");
+        while (!quit) {
+            SDL_WaitEvent(&event);
+
+            switch (event.type) {
+                case SDL_QUIT:
+                printf("SDL2 quit detected, leaving.");
+                    quit = true;
+                    break;
+            }
+        }
+    }
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
