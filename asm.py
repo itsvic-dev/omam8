@@ -23,6 +23,14 @@ str_to_instruction = {
     "LDA": 0x0E,
     "STA": 0x0F,
     "JEQ": 0x10,
+    "SPIN": 0x11,
+    "IN": 0x12,
+    "OUT": 0x13,
+    "TSTA": 0x14,
+    "TSTO": 0x15,
+    "STT": 0x16,
+    "LSH": 0x17,
+    "RSH": 0x18,
     "HLT": 0xFF
 }
 

@@ -3,6 +3,8 @@
 ## specs
 - little endian
 - drives a 240 x 160 grayscale display
+- 10 I/O pins
+- 16-bit timer with 1ms precision
 
 ## memory layout
 ### MRAM - Main RAM
@@ -28,6 +30,7 @@ Full size: `0x9600`
 | Remainder | `0x00` |
 | Stack pointer | `0x0000` |
 | A | `0x00` |
+| Timer | `0x0000` |
 
 
 ## instructions
@@ -64,5 +67,21 @@ Full size: `0x9600`
 `STA x` (`0x0F 0xXX`) - Store contents of the A register in `x`
 
 `JEQ x y` (`0x10 0xXX 0xYY`) - Jump to `y` if contents in `x` are equal to the A register
+
+`SPIN x y` (`0x11 0xXX 0xYY`) - Set PIN `x` to be an input (`mram[y] = 0x0`) or output (`mram[y] = 0x1`) pin, setting the PIN value to `0` if output
+
+`IN x y` (`0x12 0xXX 0xYY`) - Read contents of pin `x` to address `y`
+
+`OUT x y` (`0x13 0xXX 0xYY`) - Write contents of address `y` to pin `x`
+
+`TSTA` (`0x14`) - Start the timer
+
+`TSTO` (`0x15`) - Stop the timer, putting the final time in the Timer register
+
+`STT x` (`0x16 0xXX`) - Store the 16-bit value of the Timer register in addresses `x` and `x+1`
+
+`LSH x y` (`0x17 0xXX 0xYY`) - Do an arithmetic left-shift operation on `x` with `y` (`x << y`)
+
+`RSH x y` (`0x18 0xXX 0xYY`) - Do an arithmetic right-shift operation on `x` with `y` (`x >> y`)
 
 `HLT` (`0xFF`) - Halt the CPU
