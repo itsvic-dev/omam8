@@ -51,8 +51,8 @@ _deps
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,visualstudiocode,linux
-build/
 
+build/
 *.oasm
 *.png
 !logo.png

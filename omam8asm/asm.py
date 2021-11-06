@@ -67,7 +67,22 @@ instructions = {
     "tldbu": 0x20,
     "ldra": 0x21,
     "ldrb": 0x22,
-    "jnzr": 0x23
+    "jnzr": 0x23,
+    "lsha": 0x24,
+    "lshb": 0x25,
+    "lshab": 0x26,
+    "rsha": 0x27,
+    "rshb": 0x28,
+    "rshab": 0x29,
+    "anda": 0x2A,
+    "andb": 0x2B,
+    "andab": 0x2C,
+    "ora": 0x2D,
+    "orb": 0x2E,
+    "orab": 0x2F,
+    "xora": 0x30,
+    "xorb": 0x31,
+    "xorab": 0x32
 }
 
 def get_16bit_as_8bit(value: int) -> tuple:
@@ -90,6 +105,19 @@ def get_label_address(label: str) -> int:
         label_name = list(labels.keys())[i]
         offset += get_label_size(label_name)
     return rom_start + offset
+
+def handle_base_a_b_ab(instruction: str, parameters: list, line_number: int):
+    new_params = parameters
+    if parameters[0].startswith("%"):
+        instruction += parameters[0][1:]
+        new_params = new_params[1:]
+    if parameters[1].startswith("%"):
+        instruction += parameters[1][1:]
+        new_params = new_params[1:]
+    return [[instructions[instruction], *new_params]]
+
+def base_a_b_ab_wrapper(instruction: str):
+    return lambda parameters, line_number: handle_base_a_b_ab(instruction, parameters, line_number)
 
 def handle_add(parameters: list, line_number: int):
     instruction = "add"
@@ -131,7 +159,12 @@ def handle_mv(parameters: list, line_number: int):
 
 pseudoinstructions = {
     "add": handle_add,
-    "mv": handle_mv
+    "mv": handle_mv,
+    "lsh": base_a_b_ab_wrapper("lsh"),
+    "rsh": base_a_b_ab_wrapper("rsh"),
+    "and": base_a_b_ab_wrapper("and"),
+    "or": base_a_b_ab_wrapper("or"),
+    "xor": base_a_b_ab_wrapper("xor")
 }
 
 def handle_line(line: str, line_number: int):
@@ -139,6 +172,7 @@ def handle_line(line: str, line_number: int):
     line = line.strip()
     if not line or line.startswith(";"):
         return
+    line = line.split(";")[0].strip()
     if line.endswith(":"):
         current_label = line[:-1]
         if current_label in labels:
@@ -147,6 +181,8 @@ def handle_line(line: str, line_number: int):
     else:
         instruction = line.split(" ")[0]
         parameters = [a.strip() for a in line[len(instruction):].split(",")]
+        if not parameters[0]:
+            parameters = []
         for i in range(len(parameters)):
             param = parameters[i]
             if param.startswith("$"):

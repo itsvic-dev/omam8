@@ -1,12 +1,12 @@
 # omam8 - an 8-bit processor architecture
 
-**Revision** 2
+**Revision** 2.1
 
 ## Specifications
 
 - little endian
 - drives a 240 x 160 grayscale display
-- 16 I/O pins
+- 16 digital I/O pins
 - 16-bit timer with 1ms precision
 
 ## Memory layout
@@ -78,6 +78,21 @@ Full size: `0x9600`
 | `ldra` | `0x21` | - | Load the remainder into the A register. |
 | `ldrb` | `0x22` | - | Load the remainder into the B register. |
 | `jnzr` | `0x23` | MRAM address | Jump to the MRAM address if the remainder is not zero. |
+| `lsha` | `0x24` | MRAM address | Does an arithmetic shift left on the A register by the value in the MRAM address. |
+| `lshb` | `0x25` | MRAM address | Does an arithmetic shift left on the B register by the value in the MRAM address. |
+| `lshab` | `0x26` | - | Does an arithmetic shift left on the A register by the value in the B register. |
+| `rsha` | `0x27` | MRAM address | Does an arithmetic shift right on the A register by the value in the MRAM address. |
+| `rshb` | `0x28` | MRAM address | Does an arithmetic shift right on the B register by the value in the MRAM address. |
+| `rshab` | `0x29` | - | Does an arithmetic shift right on the A register by the value in the B register. |
+| `anda` | `0x2A` | MRAM address | Does an AND operation on the A register with the value in the MRAM address. |
+| `andb` | `0x2B` | MRAM address | Does an AND operation on the B register with the value in the MRAM address. |
+| `andab` | `0x2C` | - | Does an AND operation on the A register with the value in the B register. |
+| `ora` | `0x2D` | MRAM address | Does an OR operation on the A register with the value in the MRAM address. |
+| `orb` | `0x2E` | MRAM address | Does an OR operation on the B register with the value in the MRAM address. |
+| `orab` | `0x2F` | - | Does an OR operation on the A register with the value in the B register. |
+| `xora` | `0x30` | MRAM address | Does an XOR operation on the A register with the value in the MRAM address. |
+| `xorb` | `0x31` | MRAM address | Does an XOR operation on the B register with the value in the MRAM address. |
+| `xorab` | `0x32` | - | Does an XOR operation on the A register with the value in the B register. |
 
 ## Assembler pseudoinstructions
 Parameter types:
@@ -91,4 +106,3 @@ Parameter types:
 | `0x00` | Pin disabled. Default mode. |
 | `0x01` | Read-only. |
 | `0x02` | Write-only. |
-| `0x03` | Read-write. |
