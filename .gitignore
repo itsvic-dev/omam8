@@ -55,6 +55,6 @@ _deps
 build/
 *.oasm
 *.png
-!logo.png
+!assets/*.png
 *.bin
 __pycache__/

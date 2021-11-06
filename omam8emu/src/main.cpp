@@ -5,11 +5,11 @@
 #include <fstream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <iomanip>
 
 namespace po = boost::program_options;
 
-std::vector<uint8_t> readROM()
-{
+std::vector<uint8_t> readROM() {
     // open the file
     std::streampos fileSize;
     std::ifstream file("rom.bin", std::ios::binary);
@@ -25,7 +25,18 @@ std::vector<uint8_t> readROM()
     // read the data
     std::vector<uint8_t> fileData(fileSize);
     file.read((char*) &fileData[0], fileSize);
+    file.close();
     return fileData;
+}
+
+void dumpRAM(EmulatorCore core) {
+    std::ofstream mram_file("mram.bin", std::ios::out | std::ios::binary | std::ios::trunc);
+    mram_file.write((char*) core.mram, 0xFFFF);
+    mram_file.close();
+
+    std::ofstream vram_file("vram.bin", std::ios::out | std::ios::binary | std::ios::trunc);
+    vram_file.write((char*) core.vram, 0x9600);
+    vram_file.close();
 }
 
 TTF_Font* Font = nullptr;
@@ -60,11 +71,11 @@ void displayVRAM(SDL_Renderer* renderer, EmulatorCore core) {
     SDL_Color Black = {0, 0, 0};
 
     std::ostringstream ab;
-    ab << "A: " << std::to_string(core.reg_a);
-    ab << " | B: " << std::to_string(core.reg_b);
+    ab << "A: 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << (int) core.reg_a;
+    ab << " | B: 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(2) << (int) core.reg_b;
     std::ostringstream pcsp;
-    pcsp << "PC: " << std::to_string(core.reg_pc);
-    pcsp << " | SP: " << std::to_string(core.reg_sp);
+    pcsp << "PC: 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << (int) core.reg_pc;
+    pcsp << " | SP: 0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(4) << (int) core.reg_sp;
 
     SDL_Surface* AB_Surface = TTF_RenderText_Shaded(
         Font, ab.str().c_str(), White, Black
@@ -105,16 +116,24 @@ int main(int argc, char** argv) {
     po::options_description optional_args("Arguments");
     optional_args.add_options()
         ("help", "show this help message and exit")
-        ("verbose", "outputs the instructions processed in omam8 assembler form")
+        ("version", "show version info and exit")
+        ("verbose", "outputs the instructions processed in omam8 assembler form and dumps contents of MRAM/VRAM on halt")
     ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, optional_args), vm);
     po::notify(vm);
 
+    if (vm.count("version") || vm.count("help")) {
+        std::cout << "omam8 emulator v" << OMAM8EMU_VERSION << ", supporting spec v" << SPEC_VERSION << std::endl;
+    }
+
     if (vm.count("help")) {
-        std::cout << "omam8 emulator v" << OMAM8EMU_VERSION << std::endl << std::endl;
-        std::cout << optional_args;
+        std::cout << std::endl << optional_args;
+        return 0;
+    }
+
+    if (vm.count("version")) {
         return 0;
     }
 
@@ -189,11 +208,17 @@ int main(int argc, char** argv) {
             switch(exception) {
                 case 0xFF:
                     std::cout << "CPU halted." << std::endl;
-                    return 0;
+                    break;
                 default:
                     std::cerr << "Unknown exception has occured, check the log output for more information." << std::endl;
-                    return 1;
             }
+
+            if (verbose) {
+                printf("\n--- REGISTERS ---\nA: 0x%02X\nB: 0x%02X\nR: 0x%02X\nPC: 0x%04X\nSP: 0x%04X\n",
+                    core.reg_a, core.reg_b, core.reg_r, core.reg_pc, core.reg_sp);
+                dumpRAM(core);
+            }
+            return 0;
         }
         displayVRAM(renderer, core);
     }
