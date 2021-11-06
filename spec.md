@@ -1,13 +1,18 @@
 # omam8 - an 8-bit processor architecture
 
-## specs
+**Revision** 2
+
+## Specifications
+
 - little endian
 - drives a 240 x 160 grayscale display
-- 10 I/O pins
+- 16 I/O pins
 - 16-bit timer with 1ms precision
 
-## memory layout
-### MRAM - Main RAM
+## Memory layout
+
+### `MRAM` - Main RAM
+
 Full size: `0xFFFF`
 
 `0x0000` - `0x00FF` = Stack
@@ -16,72 +21,74 @@ Full size: `0xFFFF`
 
 `0x8000` - `0xFFFF` = ROM
 
+### `VRAM` - Video RAM
 
-### VRAM - Video RAM
 Full size: `0x9600`
 
 `0x0000` - `0x9600` = VRAM
 
+## Registers
 
-## registers
-| register | initial value |
-| -------- | ------------- |
-| Program counter | `0x8000` |
-| Remainder | `0x00` |
-| Stack pointer | `0x0000` |
-| A | `0x00` |
-| Timer | `0x0000` |
+| Register        | Initial value | Bits |
+| --------------- | ------------- | ---- |
+| Program counter | `0x8000`      | 16   |
+| Remainder       | `0x00`        | 8    |
+| Stack pointer   | `0x00FF`      | 16   |
+| Timer           | `0x0000`      | 16   |
+| A               | `0x00`        | 8    |
+| B               | `0x00`        | 8    |
 
+## Instructions
 
-## instructions
-`JMP x` (`0x00 0xXX`) - Jump to a 16-bit address in MRAM
+| Assembler instruction | Representative byte | Parameters | Description |
+| --------------------- | ------------------- | ---------- | ----------- |
+| `hlt` | `0x00` | - | Halt the CPU. |
+| `lda` | `0x01` | MRAM address | Load the value in the MRAM address to the A register. |
+| `ldb` | `0x02` | MRAM address | Load the value in the MRAM address to the B register. |
+| `sta` | `0x03` | MRAM address | Store the value in A register to the MRAM address. |
+| `stb` | `0x04` | MRAM address | Store the value in B register to the MRAM address. |
+| `adda` | `0x05` | MRAM address | Add the value in the MRAM address to the A register. |
+| `addb` | `0x06` | MRAM address | Add the value in the memory address to the B register. |
+| `suba` | `0x07` | MRAM address | Subtract the value in the MRAM address from the A register. |
+| `subb` | `0x08` | MRAM address | Subtract the value in the MRAM address from the B register. |
+| `j` | `0x09` | MRAM address | Jump to the MRAM address. |
+| `jab` | `0x0A` | - | Jump to the MRAM address stored in registers, where the B register is treated as the upper byte and the A register is treated as the lower byte. |
+| `spua` | `0x0B` | - | Push the value in the A register to the stack. |
+| `spub` | `0x0C` | - | Push the value in the B register to the stack. |
+| `spoa` | `0x0D` | - | Pop the value from the stack to the A register. |
+| `spob` | `0x0E` | - | Pop the value from the stack to the B register. |
+| `vlda` | `0x0F` | VRAM address | Load the value in the VRAM address to the A register. |
+| `vldb` | `0x10` | VRAM address | Load the value in the VRAM address to the B register. |
+| `vsta` | `0x11` | VRAM address | Store the value in A register to the VRAM address. |
+| `vstb` | `0x12` | VRAM address | Store the value in B register to the VRAM address. |
+| `inab` | `0x13` | - | Read the value stored in the pin - defined in the A register - into the B register. |
+| `outab` | `0x14` | - | Write the value in the B register into the pin defined in the A register. |
+| `pinab` | `0x15` | - | Set the mode of the pin - defined in the A register - with the value in the B register. |
+| `jza` | `0x16` | MRAM address | Jump to the MRAM address if the value in the A register is zero. |
+| `jzb` | `0x17` | MRAM address | Jump to the MRAM address if the value in the B register is zero. |
+| `jnza` | `0x18` | MRAM address | Jump to the MRAM address if the value in the A register is not zero. |
+| `jnzb` | `0x19` | MRAM address | Jump to the MRAM address if the value in the B register is not zero. |
+| `jeqab` | `0x1A` | MRAM address | Jump to the MRAM address if the value in the A register is equal to one in the B register. |
+| `tsta` | `0x1B` | - | Start the timer. |
+| `tsto` | `0x1C` | - | Stop the timer. |
+| `tldal` | `0x1D` | - | Load the lower byte of the timer register into the A register. |
+| `tldau` | `0x1E` | - | Load the upper byte of the timer register into the A register. |
+| `tldbl` | `0x1F` | - | Load the lower byte of the timer register into the B register. |
+| `tldbu` | `0x20` | - | Load the upper byte of the timer register into the B register. |
+| `ldra` | `0x21` | - | Load the remainder into the A register. |
+| `ldrb` | `0x22` | - | Load the remainder into the B register. |
+| `jnzr` | `0x23` | MRAM address | Jump to the MRAM address if the remainder is not zero. |
 
-`JNZ x` (`0x01 0xXX`) - Jump to a 16-bit address in MRAM **if the remainder register is not 0**
+## Assembler pseudoinstructions
+Parameter types:
+ - `Any`: Register (`%a`, `%b`, `%r`), value (`$0x1`) or memory address (`0x0001`)
 
-`JZ x` (`0x02 0xXX`) - Jump to a 16-bit address in MRAM **if the remainder register is 0**
+**TODO**
 
-`ADD x y` (`0x03 0xXX 0xYY`) - Add contents of `x` to contents of `y` (`y + x`)
-
-`SUB x y` (`0x04 0xXX 0xYY`) - Subtract contents of `x` from contents of `y` (`y - x`)
-
-`MOV x y` (`0x05 0xXX 0xYY`) - Move/copy contents of `x` to address `y`
-
-`VMOV x y` (`0x06 0xXX 0xYY`) - Move/copy contents of `x` in MRAM to address `y` in VRAM
-
-`MUL x y` (`0x07 0xXX 0xYY`) - Multiply contents of `y` with contents of `x` (`y * x`)
-
-`DIV x y` (`0x08 0xXX 0xYY`) - Divide contents of `y` with contents of `x` (`y / x`)
-
-`SPU x` (`0x09 0xXX`) - Push contents of `x` to the stack
-
-`SPO x` (`0x0A 0xXX`) - Pop an element from the stack into `x`
-
-`CLR` (`0x0B`) - Clear remainder
-
-`AND x y` (`0x0C 0xXX 0xYY`) - AND `x` and `y` together, storing the result in `y` (`y = x & y`)
-
-`VRD x y` (`0x0D 0xXX 0xYY`) - Move/copy contents of `x` in VRAM to address `y` in MRAM
-
-`LDA x` (`0x0E 0xXX`) - Load contents of `x` to the A register
-
-`STA x` (`0x0F 0xXX`) - Store contents of the A register in `x`
-
-`JEQ x y` (`0x10 0xXX 0xYY`) - Jump to `y` if contents in `x` are equal to the A register
-
-`SPIN x y` (`0x11 0xXX 0xYY`) - Set PIN `x` to be an input (`mram[y] = 0x0`) or output (`mram[y] = 0x1`) pin, setting the PIN value to `0` if output
-
-`IN x y` (`0x12 0xXX 0xYY`) - Read contents of pin `x` to address `y`
-
-`OUT x y` (`0x13 0xXX 0xYY`) - Write contents of address `y` to pin `x`
-
-`TSTA` (`0x14`) - Start the timer
-
-`TSTO` (`0x15`) - Stop the timer, putting the final time in the Timer register
-
-`STT x` (`0x16 0xXX`) - Store the 16-bit value of the Timer register in addresses `x` and `x+1`
-
-`LSH x y` (`0x17 0xXX 0xYY`) - Do an arithmetic left-shift operation on `x` with `y` (`x << y`)
-
-`RSH x y` (`0x18 0xXX 0xYY`) - Do an arithmetic right-shift operation on `x` with `y` (`x >> y`)
-
-`HLT` (`0xFF`) - Halt the CPU
+## Pin modes
+| Pin mode | Description |
+| -------- | ----------- |
+| `0x00` | Pin disabled. Default mode. |
+| `0x01` | Read-only. |
+| `0x02` | Write-only. |
+| `0x03` | Read-write. |
