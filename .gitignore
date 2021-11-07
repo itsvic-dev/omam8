@@ -58,3 +58,4 @@ build/
 !assets/*.png
 *.bin
 __pycache__/
+test/

@@ -1,6 +1,6 @@
 # omam8 - an 8-bit processor architecture
 
-**Revision** 2.2
+**Revision** 2.3
 
 ## Specifications
 
@@ -103,6 +103,8 @@ Full size: `0x9600`
 | `cmpa` | `0x39` | MRAM address | Sets the zero flag to 1 if the A register is equal to the value in the MRAM address, 0 otherwise. |
 | `cmpb` | `0x3A` | MRAM address | Sets the zero flag to 1 if the B register is equal to the value in the MRAM address, 0 otherwise. |
 | `cmpab` | `0x3B` | - | Sets the zero flag to 1 if the A register is equal to the B register, 0 otherwise. |
+| `addab` | `0x3C` | - | Add the value in the B register to the A register. |
+| `subab` | `0x3D` | - | Subtract the value in the B register from the A register. |
 
 ## Assembler pseudoinstructions
 Parameter types:

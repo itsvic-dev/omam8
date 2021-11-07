@@ -91,7 +91,9 @@ instructions = {
     "setneb": 0x38,
     "cmpa": 0x39,
     "cmpb": 0x3A,
-    "cmpab": 0x3B
+    "cmpab": 0x3B,
+    "addab": 0x3C,
+    "subab": 0x3D
 }
 
 def get_16bit_as_8bit(value: int) -> tuple:
@@ -128,18 +130,6 @@ def handle_base_a_b_ab(instruction: str, parameters: list, line_number: int):
 def a_b_ab_wrapper(instruction: str):
     return lambda parameters, line_number: handle_base_a_b_ab(instruction, parameters, line_number)
 
-def handle_add_sub(instruction: str, parameters: list, line_number: int):
-    new_params = []
-    if parameters[1].startswith("%"):
-        if parameters[1] == "%r":
-            raise omam8asm.exceptions.UnsupportedPseudoinstructionParameter(f"Attempted use of remainder register in add at {args.input}:{line_number}")
-        instruction += parameters[1][1:]
-        new_params = parameters[:-1]
-    return [[instructions[instruction], *new_params]]
-
-def add_sub_wrapper(instruction: str):
-    return lambda parameters, line_number: handle_add_sub(instruction, parameters, line_number)
-
 def handle_mv(parameters: list, line_number: int):
     instruction = "mv"
     new_params = []
@@ -169,8 +159,8 @@ def handle_mv(parameters: list, line_number: int):
     ]
 
 pseudoinstructions = {
-    "add": add_sub_wrapper("add"),
-    "sub": add_sub_wrapper("sub"),
+    "add": a_b_ab_wrapper("add"),
+    "sub": a_b_ab_wrapper("sub"),
     "mv": handle_mv,
     "lsh": a_b_ab_wrapper("lsh"),
     "rsh": a_b_ab_wrapper("rsh"),

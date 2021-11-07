@@ -412,6 +412,18 @@ void EmulatorCore::run_clock_cycle() {
             if (verbose) printf("cmpab\n");
             return;
         }
+        case 0x3C: { // addab
+            reg_a += reg_b;
+            reg_pc += 1;
+            if (verbose) printf("addab\n");
+            return;
+        }
+        case 0x3D: { // subab
+            reg_a -= reg_b;
+            reg_pc += 1;
+            if (verbose) printf("subab\n");
+            return;
+        }
         default:
             std::cout << "[EMULATOR CORE] Unknown instruction ";
             printf("0x%02X", instruction);
