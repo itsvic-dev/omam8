@@ -41,56 +41,56 @@ void EmulatorCore::run_clock_cycle() {
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_a = mram[addr];
             reg_pc += 3;
-            if (verbose) printf("lda 0x%04X\n", addr, reg_a);
+            if (verbose) printf("lda 0x%04X\n", addr);
             return;
         }
         case 0x02: { // ldb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_b = mram[addr];
             reg_pc += 3;
-            if (verbose) printf("ldb 0x%04X\n", addr, reg_a);
+            if (verbose) printf("ldb 0x%04X\n", addr);
             return;
         }
         case 0x03: { // sta
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             mram[addr] = reg_a;
             reg_pc += 3;
-            if (verbose) printf("sta 0x%04X\n", addr, reg_a);
+            if (verbose) printf("sta 0x%04X\n", addr);
             return;
         }
         case 0x04: { // stb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             mram[addr] = reg_b;
             reg_pc += 3;
-            if (verbose) printf("stb 0x%04X\n", addr, reg_a);
+            if (verbose) printf("stb 0x%04X\n", addr);
             return;
         }
         case 0x05: { // adda
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_a += mram[addr];
             reg_pc += 3;
-            if (verbose) printf("adda 0x%04X\n", addr, reg_a);
+            if (verbose) printf("adda 0x%04X\n", addr);
             return;
         }
         case 0x06: { // addb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_b += mram[addr];
             reg_pc += 3;
-            if (verbose) printf("addb 0x%04X\n", addr, reg_a);
+            if (verbose) printf("addb 0x%04X\n", addr);
             return;
         }
         case 0x07: { // suba
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_a -= mram[addr];
             reg_pc += 3;
-            if (verbose) printf("suba 0x%04X\n", addr, reg_a);
+            if (verbose) printf("suba 0x%04X\n", addr);
             return;
         }
         case 0x08: { // subb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             reg_b -= mram[addr];
             reg_pc += 3;
-            if (verbose) printf("subb 0x%04X\n", addr, reg_a);
+            if (verbose) printf("subb 0x%04X\n", addr);
             return;
         }
         case 0x09: { // j
@@ -135,6 +135,10 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x0F: { // vlda
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x9600) {
+                fprintf(stderr, "[EMULATOR CORE] vlda: attempted read beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                throw 0xFF;
+            }
             reg_a = vram[addr];
             reg_pc += 3;
             if (verbose) printf("vlda 0x%04X\n", addr);
@@ -142,6 +146,10 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x10: { // vldb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x9600) {
+                fprintf(stderr, "[EMULATOR CORE] vldb: attempted read beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                throw 0xFF;
+            }
             reg_b = vram[addr];
             reg_pc += 3;
             if (verbose) printf("vldb 0x%04X\n", addr);
@@ -149,6 +157,10 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x11: { // vsta
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x9600) {
+                fprintf(stderr, "[EMULATOR CORE] vsta: attempted write beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                throw 0xFF;
+            }
             vram[addr] = reg_a;
             reg_pc += 3;
             if (verbose) printf("vsta 0x%04X\n", addr);
@@ -156,6 +168,10 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x12: { // vstb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x9600) {
+                fprintf(stderr, "[EMULATOR CORE] vstb: attempted write beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                throw 0xFF;
+            }
             vram[addr] = reg_b;
             reg_pc += 3;
             if (verbose) printf("vstb 0x%04X\n", addr);

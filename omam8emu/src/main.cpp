@@ -29,6 +29,27 @@ std::vector<uint8_t> readROM() {
     return fileData;
 }
 
+std::vector<uint8_t> readFromStdin() {
+    std::freopen(nullptr, "rb", stdin);
+
+    if (std::ferror(stdin))
+        throw std::runtime_error(std::strerror(errno));
+    
+    std::size_t len;
+    std::array<uint8_t, 1024> buf;
+
+    std::vector<uint8_t> input;
+
+    while((len = std::fread(buf.data(), sizeof(buf[0]), buf.size(), stdin)) > 0) {
+        if(std::ferror(stdin) && !std::feof(stdin))
+            throw std::runtime_error(std::strerror(errno));
+        
+        input.insert(input.end(), buf.data(), buf.data() + len);
+    }
+
+    return input;
+}
+
 void dumpRAM(EmulatorCore core) {
     std::ofstream mram_file("mram.bin", std::ios::out | std::ios::binary | std::ios::trunc);
     mram_file.write((char*) core.mram, 0xFFFF);
@@ -119,6 +140,8 @@ int main(int argc, char** argv) {
         ("version", "show version info and exit")
         ("verbose", "outputs the instructions processed in omam8 assembler form and dumps contents of MRAM/VRAM on halt")
         ("delay", po::value<long>(), "delay between each clock cycle (in ms), useful for debugging")
+        ("nographic", "disables the SDL2 display")
+        ("stdin", "reads the ROM from stdin as opposed to rom.bin")
     ;
 
     po::variables_map vm;
@@ -148,13 +171,23 @@ int main(int argc, char** argv) {
         verbose = true;
     }
 
+    bool sdl = true;
+    if (vm.count("nographic")) {
+        sdl = false;
+    }
+
+    bool uses_stdin = false;
+    if (vm.count("stdin")) {
+        uses_stdin = true;
+    }
+
     std::cout << "Starting omam8 emulator v" << OMAM8EMU_VERSION << "..." << std::endl;
 
     EmulatorCore core;
 
     try {
         std::cout << "Initializing emulator core..." << std::endl;
-        core.initialize(readROM(), verbose);
+        core.initialize(uses_stdin ? readFromStdin() : readROM(), verbose);
     } catch (int exception) {
         switch(exception) {
             case 1:
@@ -166,46 +199,52 @@ int main(int argc, char** argv) {
         }
     }
 
-    std::cout << "Initializing SDL2..." << std::endl;
+    SDL_Renderer* renderer;
 
-    int rendererFlags = SDL_RENDERER_ACCELERATED;
-    int windowFlags = 0;
+    if (sdl) {
+        std::cout << "Initializing SDL2..." << std::endl;
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
-        return 1;
+        int rendererFlags = SDL_RENDERER_ACCELERATED;
+        int windowFlags = 0;
+
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            std::cerr << "Failed to initialize SDL: " << SDL_GetError() << std::endl;
+            return 1;
+        }
+
+        SDL_Window* window = SDL_CreateWindow(
+            "omam8 emulator",
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            240, 160 + 64, windowFlags
+        );
+
+        if (!window) {
+            std::cerr << "Failed to open window: " << SDL_GetError() << std::endl;
+            return 1;
+        }
+
+        renderer = SDL_CreateRenderer(
+            window, -1, rendererFlags
+        );
+
+        if (!renderer) {
+            std::cerr << "Failed to create renderer: " << SDL_GetError() << std::endl;
+            return 1;
+        }
+
+        TTF_Init();
     }
-
-    SDL_Window* window = SDL_CreateWindow(
-        "omam8 emulator",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        240, 160 + 64, windowFlags
-    );
-
-    if (!window) {
-        std::cerr << "Failed to open window: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-
-    SDL_Renderer* renderer = SDL_CreateRenderer(
-        window, -1, rendererFlags
-    );
-
-    if (!renderer) {
-        std::cerr << "Failed to create renderer: " << SDL_GetError() << std::endl;
-        return 1;
-    }
-
-    TTF_Init();
 
     while (true) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch(event.type) {
-                case SDL_QUIT:
-                    return 0;
-                default:
-                    break;
+        if (sdl) {
+            SDL_Event event;
+            while (SDL_PollEvent(&event)) {
+                switch(event.type) {
+                    case SDL_QUIT:
+                        return 0;
+                    default:
+                        break;
+                }
             }
         }
         try {
@@ -226,9 +265,11 @@ int main(int argc, char** argv) {
             }
             return 0;
         }
-        displayVRAM(renderer, core);
-        if (delay) {
-            SDL_Delay(delay);
+        if (sdl) {
+            displayVRAM(renderer, core);
+            if (delay) {
+                SDL_Delay(delay);
+            }
         }
     }
 

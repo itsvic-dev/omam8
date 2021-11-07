@@ -44,7 +44,7 @@ instructions = {
     "j": 0x09,
     "jab": 0x0A,
     "spua": 0x0B,
-    "spub": 0x0B,
+    "spub": 0x0C,
     "spoa": 0x0D,
     "spob": 0x0E,
     "vlda": 0x0F,
