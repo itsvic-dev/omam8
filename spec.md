@@ -1,6 +1,6 @@
 # omam8 - an 8-bit processor architecture
 
-**Revision** 2.1
+**Revision** 2.2
 
 ## Specifications
 
@@ -37,6 +37,7 @@ Full size: `0x9600`
 | Timer           | `0x0000`      | 16   |
 | A               | `0x00`        | 8    |
 | B               | `0x00`        | 8    |
+| Zero flag       | `0x00`        | 8    |
 
 ## Instructions
 
@@ -93,6 +94,15 @@ Full size: `0x9600`
 | `xora` | `0x30` | MRAM address | Does an XOR operation on the A register with the value in the MRAM address. |
 | `xorb` | `0x31` | MRAM address | Does an XOR operation on the B register with the value in the MRAM address. |
 | `xorab` | `0x32` | - | Does an XOR operation on the A register with the value in the B register. |
+| `jz` | `0x33` | MRAM address | Jump to the MRAM address if the zero flag is equal to 1. |
+| `jnz` | `0x34` | MRAM address | Jump to the MRAM address if the zero flag is equal to 0. |
+| `setea` | `0x35` | - | Sets the A register to 1 if the zero flag is equal to 1, 0 otherwise. |
+| `seteb` | `0x36` | - | Sets the B register to 1 if the zero flag is equal to 1, 0 otherwise. |
+| `setnea` | `0x37` | - | Sets the A register to 1 if the zero flag is equal to 0, 0 otherwise. |
+| `setneb` | `0x38` | - | Sets the B register to 1 if the zero flag is equal to 0, 0 otherwise. |
+| `cmpa` | `0x39` | MRAM address | Sets the zero flag to 1 if the A register is equal to the value in the MRAM address, 0 otherwise. |
+| `cmpb` | `0x3A` | MRAM address | Sets the zero flag to 1 if the B register is equal to the value in the MRAM address, 0 otherwise. |
+| `cmpab` | `0x3B` | - | Sets the zero flag to 1 if the A register is equal to the B register, 0 otherwise. |
 
 ## Assembler pseudoinstructions
 Parameter types:

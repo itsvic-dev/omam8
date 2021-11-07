@@ -223,7 +223,7 @@ void EmulatorCore::run_clock_cycle() {
         case 0x1E:   // tldau
         case 0x1F:   // tldbl
         case 0x20: { // tldbu
-            std::cerr << "[EMULATOR CORE] timer instructions called, not supported." << std::endl;
+            std::cerr << "[EMULATOR CORE] timer instruction called, not supported." << std::endl;
             throw 1;
         }
         case 0x21: { // ldra
@@ -346,6 +346,70 @@ void EmulatorCore::run_clock_cycle() {
             reg_a = reg_a ^ reg_b;
             reg_pc += 1;
             if (verbose) printf("xorab\n");
+            return;
+        }
+        case 0x33: { // jz
+            uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (reg_zf == 1) {
+                reg_pc = addr;
+            } else {
+                reg_pc += 3;
+            }
+            if (verbose) printf("jz 0x%04X\n", addr);
+            return;
+        }
+        case 0x34: { // jnz
+            uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (reg_zf == 0) {
+                reg_pc = addr;
+            } else {
+                reg_pc += 3;
+            }
+            if (verbose) printf("jnz 0x%04X\n", addr);
+            return;
+        }
+        case 0x35: { // setea
+            reg_a = reg_zf;
+            reg_pc += 1;
+            if (verbose) printf("setea\n");
+            return;
+        }
+        case 0x36: { // seteb
+            reg_b = reg_zf;
+            reg_pc += 1;
+            if (verbose) printf("seteb\n");
+            return;
+        }
+        case 0x37: { // setnea
+            reg_a = !reg_zf;
+            reg_pc += 1;
+            if (verbose) printf("setnea\n");
+            return;
+        }
+        case 0x38: { // setneb
+            reg_b = !reg_zf;
+            reg_pc += 1;
+            if (verbose) printf("setneb\n");
+            return;
+        }
+        case 0x39: { // cmpa
+            uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            reg_zf = reg_a == mram[addr];
+            reg_pc += 3;
+            if (verbose) printf("cmpa 0x%04X\n", addr);
+            return;
+        }
+        case 0x3A: { // cmpb
+            uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            reg_zf = reg_b == mram[addr];
+            reg_pc += 3;
+            if (verbose) printf("cmpb 0x%04X\n", addr);
+            return;
+        }
+        case 0x3B: { // cmpab
+            reg_zf = reg_a == reg_b;
+            reg_pc += 1;
+            if (verbose) printf("cmpab\n");
             return;
         }
         default:

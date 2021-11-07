@@ -214,8 +214,8 @@ int main(int argc, char** argv) {
             }
 
             if (verbose) {
-                printf("\n--- REGISTERS ---\nA: 0x%02X\nB: 0x%02X\nR: 0x%02X\nPC: 0x%04X\nSP: 0x%04X\n",
-                    core.reg_a, core.reg_b, core.reg_r, core.reg_pc, core.reg_sp);
+                printf("\n--- REGISTERS ---\nA: 0x%02X\nB: 0x%02X\nR: 0x%02X\nZF: 0x%02X\nPC: 0x%04X\nSP: 0x%04X\n",
+                    core.reg_a, core.reg_b, core.reg_r, core.reg_zf, core.reg_pc, core.reg_sp);
                 dumpRAM(core);
             }
             return 0;

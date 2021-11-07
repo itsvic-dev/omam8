@@ -12,6 +12,7 @@ public:
     uint8_t reg_a = 0;
     uint8_t reg_b = 0;
     uint8_t reg_r = 0; // remainder
+    uint8_t reg_zf = 0; // zero flag
     uint16_t reg_pc = 0x8000; // program counter
     uint16_t reg_sp = 0x00FF; // stack pointer
 
