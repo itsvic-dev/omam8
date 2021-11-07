@@ -128,7 +128,7 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x0E: { // spob
             reg_sp++;
-            reg_a = mram[reg_sp];
+            reg_b = mram[reg_sp];
             reg_pc += 1;
             if (verbose) printf("spob\n");
             return;

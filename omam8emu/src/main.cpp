@@ -118,11 +118,13 @@ int main(int argc, char** argv) {
         ("help", "show this help message and exit")
         ("version", "show version info and exit")
         ("verbose", "outputs the instructions processed in omam8 assembler form and dumps contents of MRAM/VRAM on halt")
+        ("delay", po::value<long>(), "delay between each clock cycle (in ms), useful for debugging")
     ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, optional_args), vm);
     po::notify(vm);
+    long delay = 0;
 
     if (vm.count("version") || vm.count("help")) {
         std::cout << "omam8 emulator v" << OMAM8EMU_VERSION << ", supporting spec v" << SPEC_VERSION << std::endl;
@@ -135,6 +137,10 @@ int main(int argc, char** argv) {
 
     if (vm.count("version")) {
         return 0;
+    }
+
+    if (vm.count("delay")) {
+        delay = vm["delay"].as<long>();
     }
 
     bool verbose = false;
@@ -221,6 +227,9 @@ int main(int argc, char** argv) {
             return 0;
         }
         displayVRAM(renderer, core);
+        if (delay) {
+            SDL_Delay(delay);
+        }
     }
 
     return 0;
