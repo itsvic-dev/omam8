@@ -12,6 +12,7 @@ void EmulatorCore::initialize(std::vector<uint8_t> rom, bool verbose) {
         if (i - 0x8000 > rom.size()) break;
         mram[i] = rom[i - 0x8000];
     }
+
     initialized = true;
     this->verbose = verbose;
     std::cout << "[EMULATOR CORE] Initialized." << std::endl;

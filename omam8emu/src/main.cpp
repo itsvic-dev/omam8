@@ -9,10 +9,10 @@
 
 namespace po = boost::program_options;
 
-std::vector<uint8_t> readROM() {
+std::vector<uint8_t> readROM(std::string filename) {
     // open the file
     std::streampos fileSize;
-    std::ifstream file("rom.bin", std::ios::binary);
+    std::ifstream file(filename, std::ios::binary);
     if (file.fail()) {
         throw 1;
     }
@@ -137,6 +137,7 @@ int main(int argc, char** argv) {
     po::options_description optional_args("Arguments");
     optional_args.add_options()
         ("help", "show this help message and exit")
+        ("rom", po::value<std::string>(), "ROM file to open (defaults to rom.bin)")
         ("version", "show version info and exit")
         ("verbose", "outputs the instructions processed in omam8 assembler form and dumps contents of MRAM/VRAM on halt")
         ("delay", po::value<long>(), "delay between each clock cycle (in ms), useful for debugging")
@@ -160,6 +161,11 @@ int main(int argc, char** argv) {
 
     if (vm.count("version")) {
         return 0;
+    }
+
+    std::string rom_filename = "rom.bin";
+    if (vm.count("rom")) {
+        rom_filename = vm["rom"].as<std::string>();
     }
 
     if (vm.count("delay")) {
@@ -187,7 +193,7 @@ int main(int argc, char** argv) {
 
     try {
         std::cout << "Initializing emulator core..." << std::endl;
-        core.initialize(uses_stdin ? readFromStdin() : readROM(), verbose);
+        core.initialize(uses_stdin ? readFromStdin() : readROM(rom_filename), verbose);
     } catch (int exception) {
         switch(exception) {
             case 1:
