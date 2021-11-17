@@ -203,8 +203,6 @@ int main(int argc, char** argv) {
 
     if (sdl) {
         std::cout << "Initializing SDL2..." << std::endl;
-
-        int rendererFlags = SDL_RENDERER_ACCELERATED;
         int windowFlags = 0;
 
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -222,11 +220,13 @@ int main(int argc, char** argv) {
             std::cerr << "Failed to open window: " << SDL_GetError() << std::endl;
             return 1;
         }
-
-        renderer = SDL_CreateRenderer(
-            window, -1, rendererFlags
-        );
-
+        for (int i = 0; i < 2 && !renderer; i++) {
+            renderer = SDL_CreateRenderer(
+                window, 
+                -1, 
+                i == 0 ? SDL_RENDERER_ACCELERATED : SDL_RENDERER_SOFTWARE
+            );
+        }
         if (!renderer) {
             std::cerr << "Failed to create renderer: " << SDL_GetError() << std::endl;
             return 1;
