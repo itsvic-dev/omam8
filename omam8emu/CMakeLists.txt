@@ -15,10 +15,24 @@ include_directories(
     ${SDL2_TTF_INCLUDE_DIR}
 )
 
+set(SOURCES src/main.cpp src/core.cpp)
+
+if(DEFINED FUZZ)
+    message(STATUS "Compiling with fuzzing mode ON. Assuming Clang is present.")
+    set(CMAKE_CXX_COMPILER "clang++")
+    set(EXTRAFLAGS "-fsanitize=fuzzer")
+    set(SOURCES src/core.cpp src/fuzz.cpp)
+    add_definitions(-DFUZZ)
+endif()
+
 add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/core.cpp
+    ${SOURCES}
 )
+
+if(DEFINED EXTRAFLAGS)
+    target_compile_options(${PROJECT_NAME} PUBLIC ${EXTRAFLAGS})
+    target_link_options(${PROJECT_NAME} PUBLIC ${EXTRAFLAGS})
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     ${Boost_LIBRARIES}

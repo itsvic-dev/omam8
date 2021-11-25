@@ -15,7 +15,9 @@ void EmulatorCore::initialize(std::vector<uint8_t> rom, bool verbose) {
 
     initialized = true;
     this->verbose = verbose;
+    #ifndef FUZZ
     std::cout << "[EMULATOR CORE] Initialized." << std::endl;
+    #endif
 }
 
 void EmulatorCore::initialize(std::vector<uint8_t> rom) {
@@ -137,7 +139,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x0F: { // vlda
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             if (addr >= 0x9600) {
+                #ifndef FUZZ
                 fprintf(stderr, "[EMULATOR CORE] vlda: attempted read beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                #endif
                 throw 0xFF;
             }
             reg_a = vram[addr];
@@ -148,7 +152,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x10: { // vldb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             if (addr >= 0x9600) {
+                #ifndef FUZZ
                 fprintf(stderr, "[EMULATOR CORE] vldb: attempted read beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                #endif
                 throw 0xFF;
             }
             reg_b = vram[addr];
@@ -159,7 +165,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x11: { // vsta
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             if (addr >= 0x9600) {
+                #ifndef FUZZ
                 fprintf(stderr, "[EMULATOR CORE] vsta: attempted write beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                #endif
                 throw 0xFF;
             }
             vram[addr] = reg_a;
@@ -170,7 +178,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x12: { // vstb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
             if (addr >= 0x9600) {
+                #ifndef FUZZ
                 fprintf(stderr, "[EMULATOR CORE] vstb: attempted write beyond VRAM region (0x%04X), halting the CPU.\n", addr);
+                #endif
                 throw 0xFF;
             }
             vram[addr] = reg_b;
@@ -181,7 +191,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x13:   // inab
         case 0x14:   // outab
         case 0x15: { // pinab
+            #ifndef FUZZ
             std::cerr << "[EMULATOR CORE] pin instruction called, not supported." << std::endl;
+            #endif
             throw 1;
         }
         case 0x16: { // jza
@@ -240,7 +252,9 @@ void EmulatorCore::run_clock_cycle() {
         case 0x1E:   // tldau
         case 0x1F:   // tldbl
         case 0x20: { // tldbu
+            #ifndef FUZZ
             std::cerr << "[EMULATOR CORE] timer instruction called, not supported." << std::endl;
+            #endif
             throw 1;
         }
         case 0x21: { // ldra
@@ -442,9 +456,11 @@ void EmulatorCore::run_clock_cycle() {
             return;
         }
         default:
+            #ifndef FUZZ
             std::cout << "[EMULATOR CORE] Unknown instruction ";
             printf("0x%02X", instruction);
             std::cout << "." << std::endl;
+            #endif
             throw 1;
     }
 }
