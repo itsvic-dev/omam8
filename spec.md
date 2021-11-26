@@ -13,19 +13,17 @@
 
 ### `MRAM` - Main RAM
 
-Full size: `0xFFFF`
+Full size: `0x10000`
 
-`0x0000` - `0x00FF` = Stack
-
-`0x0100` - `0x7FFF` = RAM
-
-`0x8000` - `0xFFFF` = ROM
+- `0x0000` - `0x00FF` = Stack
+- `0x0100` - `0x7FFF` = RAM
+- `0x8000` - `0xFFFF` (inclusive) = ROM
 
 ### `VRAM` - Video RAM
 
 Full size: `0x9600`
 
-`0x0000` - `0x9600` = VRAM
+- `0x0000` - `0x9600` (exclusive) = Display contents
 
 ## Registers
 
