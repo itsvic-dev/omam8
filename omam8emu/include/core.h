@@ -16,7 +16,7 @@ public:
     uint16_t reg_pc = 0x8000; // program counter
     uint16_t reg_sp = 0x00FF; // stack pointer
 
-    uint8_t mram[0xFFFF];
+    uint8_t mram[0x10000];
     uint8_t vram[0x9600];
 
 private:

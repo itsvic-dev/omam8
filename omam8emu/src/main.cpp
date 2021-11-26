@@ -52,7 +52,7 @@ std::vector<uint8_t> readFromStdin() {
 
 void dumpRAM(EmulatorCore core) {
     std::ofstream mram_file("mram.bin", std::ios::out | std::ios::binary | std::ios::trunc);
-    mram_file.write((char*) core.mram, 0xFFFF);
+    mram_file.write((char*) core.mram, 0x10000);
     mram_file.close();
 
     std::ofstream vram_file("vram.bin", std::ios::out | std::ios::binary | std::ios::trunc);

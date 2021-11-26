@@ -4,7 +4,7 @@
 
 void EmulatorCore::initialize(std::vector<uint8_t> rom, bool verbose) {
     // set the memory to 0s
-    memset(mram, 0, 0xFFFF);
+    memset(mram, 0, 0x10000);
     memset(vram, 0, 0x9600);
 
     // fill the ROM region of MRAM
@@ -56,6 +56,11 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x03: { // sta
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x8000) {
+                std::cerr << "[EMULATOR CORE] sta: attempted write to ROM, ignoring." << std::endl;
+                reg_pc += 3;
+                return;
+            }
             mram[addr] = reg_a;
             reg_pc += 3;
             if (verbose) printf("sta 0x%04X\n", addr);
@@ -63,6 +68,11 @@ void EmulatorCore::run_clock_cycle() {
         }
         case 0x04: { // stb
             uint16_t addr = get_16bit_from_8bit(mram[reg_pc + 1], mram[reg_pc + 2]);
+            if (addr >= 0x8000) {
+                std::cerr << "[EMULATOR CORE] stb: attempted write to ROM, ignoring." << std::endl;
+                reg_pc += 3;
+                return;
+            }
             mram[addr] = reg_b;
             reg_pc += 3;
             if (verbose) printf("stb 0x%04X\n", addr);
@@ -109,6 +119,12 @@ void EmulatorCore::run_clock_cycle() {
             return;
         }
         case 0x0B: { // spua
+            if (reg_sp >= 0x8000) {
+                std::cerr << "[EMULATOR CORE] spua: attempted write to ROM, ignoring." << std::endl;
+                reg_sp--;
+                reg_pc += 1;
+                return;
+            }
             mram[reg_sp] = reg_a;
             reg_sp--;
             reg_pc += 1;
@@ -116,6 +132,12 @@ void EmulatorCore::run_clock_cycle() {
             return;
         }
         case 0x0C: { // spub
+            if (reg_sp >= 0x8000) {
+                std::cerr << "[EMULATOR CORE] spub: attempted write to ROM, ignoring." << std::endl;
+                reg_sp--;
+                reg_pc += 1;
+                return;
+            }
             mram[reg_sp] = reg_b;
             reg_sp--;
             reg_pc += 1;
