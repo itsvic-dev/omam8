@@ -7,8 +7,8 @@
 
 this repository contains all the files used for development of omam8.
 
-## specifications
-you can find the specifications in the [spec.md file](spec.md)
+## specification
+[the architecture specification is here.](spec/readme.md)
 
 ## file rundown
 - `omam8asm/` - omam8 assembler, callable with `python3 -m omam8asm`
