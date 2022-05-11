@@ -1,0 +1,97 @@
+# Definitions
+- *immediate* - a byte stored in the ROM.
+- *16-bit immediate* - 2 bytes stored in the ROM, forming a 16-bit LE word.
+
+# Opcode descriptions
+
+- `nop` - no opcode.
+- `mov` - copy **src**  to **dst**.
+- `mov16` - copy **src** to **dst**. (16-bit variant)
+- `add` - add **src** to **dst**, leaving the result in **dst**.
+- `sub` - subtract **src** from **dst**, leaving the result in **dst**.
+- `load` - copy address **src** to **dst**.
+- `stor` - copy **src** to address **dst**.
+- `eq` - compare **dst** `==` **src**, leaving the result in **dst**.
+- `ne` - compare **dst** `!=` **src**, leaving the result in **dst**.
+- `lt` - compare **dst** `<` **src**, leaving the result in **dst**.
+- `gt` - compare **dst** `>` **src**, leaving the result in **dst**.
+- `le` - compare **dst** `<=` **src**, leaving the result in **dst**.
+- `ge` - compare **dst** `>=` **src**, leaving the result in **dst**.
+- `jmp` - unconditionally jump to **jmp**.
+- `jeq`/`jne`/`jlt`/`jgt`/`jle`/`jge` - compare **dst** to **src** and conditionally jump to **jmp**.
+- `sio` - sets the mode of pin **pin** to mode **mode**.
+- `rio` - reads data from pin **pin**. If **pin** is in the wrong mode, this will return `0xFF`.
+- `wio` - writes data to pin **pin**. If **pin** is in the wrong mode, this will do nothing.
+- `shl` - shifts **dst** to the left by **src**.
+- `shr` - shifts **dst** to the right by **src**.
+- `and` - ANDs **dst** with **src**, leaving the result in **dst**.
+- `or` - ORs **dst** with **src**, leaving the result in **dst**.
+- `hlt` - halt the CPU.
+
+# Opcode arguments
+- `mov`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register
+- `mov16`:
+  - type of **src**:
+    - `0b01` - *16-bit immediate*
+    - `0b10` - combined register
+  - **src**: described by type of **src**
+  - **dst**: combined register
+- `add`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register
+- `sub`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register
+- `load`:
+  - type of **src**:
+    - `0b01` - *16-bit immediate*
+    - `0b10` - combined register
+  - **src**: described by type of **src**
+  - **dst**: register
+- `stor`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: combined register
+- `eq`/`ne`/`lt`/`gt`/`le`/`ge`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register
+- `jmp`:
+  - type of **jmp**:
+    - `0b01` - *16-bit immediate*
+    - `0b10` - combined register
+  - **jmp**: described by type of **jmp**
+- `jeq`/`jne`/`jlt`/`jgt`/`jle`/`jge`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register
+  - type of **jmp**:
+    - `0b01` - *16-bit immediate*
+    - `0b10` - combined register
+  - **jmp**: described by type of **jmp**
+- `sio`:
+  - **pin**: pin number, 0-31 (inclusive)
+  - **mode**: pin mode
+- `shl`/`shr`:
+  - type of **src**:
+    - `0b01` - *immediate*
+    - `0b10` - register
+  - **src**: described by type of **src**
+  - **dst**: register

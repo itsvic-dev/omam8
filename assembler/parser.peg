@@ -1,0 +1,26 @@
+Program <- (NL* Line NL*)+ EOF
+Line <- (Comment / (LabelStart (SPACE Instruction)? / Instruction) (SPACE* Comment)?)
+
+Comment <- ';' (!NL .)* NL
+
+Instruction <- (TAB / SPACE)? ((Opcode SPACE (Argument SEP?)+) / Opcode) { handle_instruction(); }
+
+Opcode <- < [a-z] [a-z0-9]+ > { handle_opcode(yytext); }
+
+Argument <- LabelMention / Address / Number / Register
+
+Register <- '%' < ('ba' / 'dc' / 'sp' / 'pc' / 'a' / 'b' / 'c' / 'd') > { handle_register(yytext); }
+
+Address <- '[' NumberBase ']' { handle_address(yytext); }
+Number <- NumberBase { handle_number(yytext); }
+NumberBase <- < (('0x' [0-9a-fA-F]+) / [0-9]+) >
+
+LabelStart <- LabelBase ':' { handle_new_label(yytext); }
+LabelMention <- '.' LabelBase { handle_label_mention(yytext); }
+LabelBase <- < [a-zA-Z_] [a-zA-Z0-9_]+ >
+
+TAB <- '\t'+
+SPACE <- ' '+
+SEP <- ',' SPACE?
+NL <- '\r\n' / '\r' / '\n'
+EOF <- !.
