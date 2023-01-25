@@ -60,3 +60,4 @@ build/
 *.bin
 __pycache__/
 test/
+.cache

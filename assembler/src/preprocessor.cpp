@@ -1,122 +1,217 @@
 #include "preprocessor.h"
-
+#include "helpers.h"
+#include "rom.h"
+#include "shared.h"
+#include <exception>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 
 Preprocessor::Preprocessor() {}
 
 Preprocessor preprocessor;
 
 void Preprocessor::handle_new_label(char *text) {
-    std::cout << "[PRE] new label: " << text << "\n";
-    this->current_label = std::string(text);
+  std::cout << "[PRE] new label: " << text << "\n";
+  this->current_label = std::string(text);
 }
 
 std::map<std::string, Opcode> opcodes = {
-    { "nop", Opcode::NOP },
-    { "mov", Opcode::MOV },
-    { "mov16", Opcode::MOV16 },
-    { "load", Opcode::LOAD },
-    { "stor", Opcode::STOR },
-    { "eq", Opcode::EQ },
-    { "ne", Opcode::NE },
-    { "lt", Opcode::LT },
-    { "gt", Opcode::GT },
-    { "le", Opcode::LE },
-    { "ge", Opcode::GE },
-    { "jmp", Opcode::JMP },
-    { "jeq", Opcode::JEQ },
-    { "jne", Opcode::JNE },
-    { "jlt", Opcode::JLT },
-    { "jgt", Opcode::JGT },
-    { "jle", Opcode::JLE },
-    { "jge", Opcode::JGE },
-    { "sio", Opcode::SIO },
-    { "rio", Opcode::RIO },
-    { "wio", Opcode::WIO },
-    { "add", Opcode::ADD },
-    { "sub", Opcode::SUB },
-    { "shl", Opcode::SHL },
-    { "shr", Opcode::SHR },
-    { "hlt", Opcode::HLT },
+    {"nop", Opcode::NOP},
+    {"hlt", Opcode::HLT},
+    {"movi", Opcode::MOVI},
+    {"movr", Opcode::MOVR},
+};
+
+std::map<std::string, PseudoOpcode> pseudoOpcodes = {
+    {"mov", PseudoOpcode::MOV},
+};
+
+std::map<std::string, uint8_t> registers = {
+    {"a", 0b000001},  {"b", 0b000010},  {"c", 0b000100},  {"d", 0b001000},
+    {"ba", 0b000011}, {"dc", 0b001100}, {"pc", 0b010000}, {"sp", 0b100000},
 };
 
 /**
  * Handles the start of a new instruction.
  */
 void Preprocessor::handle_opcode(char *text) {
-    std::cout << "[PRE] new opcode: " << text << "\n";
-    if (!opcodes.contains(std::string(text))) throw std::invalid_argument((std::stringstream() << "invalid opcode: " << text).str());
-    this->current_instruction = new inst_t;
-    this->current_instruction->opcode = opcodes[std::string(text)];
+  std::cout << "[PRE] new opcode: " << text << "\n";
+  std::string opcode = std::string(text);
+
+  if (!opcodes.contains(opcode) && !pseudoOpcodes.contains(opcode)) {
+    throw std::invalid_argument(
+        (std::stringstream() << "invalid opcode: " << text).str());
+  }
+
+  this->current_instruction = new inst_t;
+  if (opcodes.contains(opcode))
+    this->current_instruction->opcode = opcodes[opcode];
+  if (pseudoOpcodes.contains(opcode))
+    this->current_instruction->pseudoOpcode = pseudoOpcodes[opcode];
 }
 
 /**
  * Handles a LABEL preprocessor argument.
  */
 void Preprocessor::handle_label_mention(char *text) {
-    std::cout << "[PRE] label arg: " << text << "\n";
-    this->current_instruction->arguments.push_back(new arg_t { ArgType::LABEL, std::string(text) });
+  std::cout << "[PRE] label arg: " << text << "\n";
+  this->current_instruction->arguments.push_back(
+      new arg_t{ArgType::LABEL, std::string(text)});
 }
 
 /**
  * Handles a REGISTER preprocessor argument.
  */
 void Preprocessor::handle_register(char *text) {
-    std::cout << "[PRE] register arg: " << text << "\n";
-    this->current_instruction->arguments.push_back(new arg_t { ArgType::REGISTER, std::string(text) });
+  std::cout << "[PRE] register arg: " << text << "\n";
+  this->current_instruction->arguments.push_back(
+      new arg_t{ArgType::REGISTER, std::string(text)});
 }
 
 /**
  * Handles an ADDRESS preprocessor argument.
  */
 void Preprocessor::handle_address(char *text) {
-    std::cout << "[PRE] address arg: " << text << "\n";
-    this->current_instruction->arguments.push_back(new arg_t { ArgType::ADDRESS, std::string(text) });
+  std::cout << "[PRE] address arg: " << text << "\n";
+  this->current_instruction->arguments.push_back(
+      new arg_t{ArgType::ADDRESS, std::string(text)});
 }
 
 /**
  * Handles a NUMBER preprocessor argument.
  */
 void Preprocessor::handle_number(char *text) {
-    std::cout << "[PRE] number arg: " << text << "\n";
-    this->current_instruction->arguments.push_back(new arg_t { ArgType::NUMBER, std::string(text) });
+  std::cout << "[PRE] number arg: " << text << "\n";
+  this->current_instruction->arguments.push_back(
+      new arg_t{ArgType::NUMBER, std::string(text)});
 }
 
 /**
  * Handles the end of an instruction, pushing it to the labels map.
  */
 void Preprocessor::handle_instruction() {
-    std::cout << "[PRE] insn end\n";
-    if (!labels.contains(current_label)) labels[current_label] = std::list<inst_t *>();
-    labels[current_label].push_back(this->current_instruction);
+  std::cout << "[PRE] insn end\n";
+
+  if (!labels.contains(current_label))
+    labels[current_label] = std::vector<inst_t *>();
+
+  labels[current_label].push_back(this->current_instruction);
+}
+
+void Preprocessor::build_intermediate_rom() {
+  std::cout << "[PRE] intermediate ROM start\n";
+  for (const auto &[label, inst_list] : labels) {
+    std::cout << label << " has " << inst_list.size() << " instructions\n";
+
+    if (!stage2_rom.contains(label))
+      stage2_rom[label] = std::vector<uint8_t>();
+
+    for (inst_t *inst : inst_list) {
+      // transform inst_t into raw bytes
+      if (inst->pseudoOpcode != PseudoOpcode::NONE) {
+        switch (inst->pseudoOpcode) {
+        case PseudoOpcode::MOV: {
+          if (inst->arguments.size() != 2) {
+            throw std::invalid_argument(
+                "pseudo-op mov has invalid number of arguments");
+          }
+          if (inst->arguments[0]->type == ArgType::NUMBER) {
+            inst->opcode = Opcode::MOVI;
+          }
+          if (inst->arguments[0]->type == ArgType::REGISTER) {
+            inst->opcode = Opcode::MOVR;
+          }
+          break;
+        }
+        default: {
+          throw std::invalid_argument("unknown pseudo-opcode");
+        }
+        }
+      }
+
+      stage2_rom[label].push_back(static_cast<uint8_t>(inst->opcode));
+
+      for (arg_t *arg : inst->arguments) {
+        switch (arg->type) {
+        case ArgType::NUMBER: {
+          int value = std::stoi(arg->contents);
+          stage2_rom[label].push_back(static_cast<uint8_t>(value));
+          break;
+        }
+        case ArgType::LABEL: {
+          stage2_rom[label].push_back(0);
+          stage2_rom[label].push_back(0);
+          stage2_rom_label_positions[label].push_back(new label_pos_t{
+              static_cast<uint16_t>(stage2_rom[label].size() - 2),
+              arg->contents});
+          break;
+        }
+        case ArgType::REGISTER: {
+          stage2_rom[label].push_back(registers[arg->contents]);
+          break;
+        }
+        default: {
+          std::cout << "[PRE] unknown arg type encountered: "
+                    << static_cast<int>(arg->type) << "\n";
+          throw std::exception();
+        }
+        }
+      }
+    }
+  }
+
+  std::cout << "[PRE] stage 2 processing done, stage 3 start\n";
+  uint16_t offset = 0x8000; // start of lower ROM
+  std::map<std::string, uint16_t> label_offsets;
+  // now that we know the size of each label, we can start assigning label
+  // offsets
+  for (const auto &[label, insts] : stage2_rom) {
+    std::cout << label << " offset: " << offset << "\n";
+    label_offsets[label] = offset;
+    offset += insts.size();
+  }
+  // then assign label addresses to their 0x0000 placeholders in the ROM
+  for (const auto &[label, positions] : stage2_rom_label_positions) {
+    for (label_pos_t *position : positions) {
+      uint16_t label_offset = label_offsets[position->label];
+      uint16_to_8_t label_offset_8 = split_uint16_to_8(label_offset);
+      std::cout << label << " " << position->label << " "
+                << std::to_string(label_offset_8.upper) << " "
+                << std::to_string(label_offset_8.lower) << "\n";
+      stage2_rom[label][position->position] = label_offset_8.lower;
+      stage2_rom[label][position->position + 1] = label_offset_8.upper;
+    }
+  }
+  // and now, finish stage 3 by dumping stage 2's raw data into its own list
+  for (const auto &[_, values] : stage2_rom) {
+    for (uint8_t val : values) {
+      stage3_rom.push_back(val);
+    }
+  }
+  // and if stage 3's data is smaller than 0x8000, fill it with 0xFFs
+  if (stage3_rom.size() < 0x8000) {
+    for (int i = stage3_rom.size(); i < 0x8000; i++) {
+      stage3_rom.push_back(0xFF);
+    }
+  }
+}
+
+void Preprocessor::save_rom(std::string path) {
+  build_and_write_rom(path, stage3_rom);
 }
 
 // Helper functions
-void handle_new_label(char *text) {
-    preprocessor.handle_new_label(text);
-}
+void handle_new_label(char *text) { preprocessor.handle_new_label(text); }
 
-void handle_opcode(char *text) {
-    preprocessor.handle_opcode(text);
-}
+void handle_opcode(char *text) { preprocessor.handle_opcode(text); }
 
 void handle_label_mention(char *text) {
-    preprocessor.handle_label_mention(text);
+  preprocessor.handle_label_mention(text);
 }
-void handle_register(char *text) {
-    preprocessor.handle_register(text);
-}
-void handle_address(char *text) {
-    preprocessor.handle_address(text);
-}
-void handle_number(char *text) {
-    preprocessor.handle_number(text);
-}
-void handle_instruction() {
-    preprocessor.handle_instruction();
-}
+void handle_register(char *text) { preprocessor.handle_register(text); }
+void handle_address(char *text) { preprocessor.handle_address(text); }
+void handle_number(char *text) { preprocessor.handle_number(text); }
+void handle_instruction() { preprocessor.handle_instruction(); }
 
-Preprocessor get_preprocessor() {
-    return preprocessor;
-}
+Preprocessor &get_preprocessor() { return preprocessor; }
