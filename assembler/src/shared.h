@@ -5,9 +5,13 @@
 
 enum class Opcode : uint8_t {
   NOP = 0b00000000,
+  HLT = 0b11111111,
   MOVI = 0b10000000,
   MOVR = 0b10000001,
-  HLT = 0b11111111,
+  ADDI = 0b01000000,
+  ADDR = 0b01000001,
+  SUBI = 0b01100000,
+  SUBR = 0b01100001,
 };
 
 /**
@@ -18,6 +22,8 @@ enum class Opcode : uint8_t {
 enum class PseudoOpcode : int {
   NONE,
   MOV,
+  ADD,
+  SUB,
 };
 
 #endif // SHARED_H

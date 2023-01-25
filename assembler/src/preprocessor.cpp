@@ -2,8 +2,10 @@
 #include "helpers.h"
 #include "rom.h"
 #include "shared.h"
+#include <algorithm>
 #include <exception>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <stdexcept>
 
@@ -23,8 +25,31 @@ std::map<std::string, Opcode> opcodes = {
     {"movr", Opcode::MOVR},
 };
 
-std::map<std::string, PseudoOpcode> pseudoOpcodes = {
-    {"mov", PseudoOpcode::MOV},
+typedef struct pseudo_predicate {
+  int arg_pos;
+  Preprocessor::ArgType arg_type;
+  Opcode opcode;
+} pseudo_predicate_t;
+
+typedef struct pseudo {
+  PseudoOpcode opcode;
+  std::list<pseudo_predicate_t> predicates;
+  int must_match_n_predicates = 1;
+} pseudo_t;
+
+std::map<std::string, pseudo_t> pseudoOpcodes = {
+    {"mov",
+     {PseudoOpcode::MOV,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::MOVI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::MOVR}}}},
+    {"add",
+     {PseudoOpcode::ADD,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::ADDI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::ADDR}}}},
+    {"sub",
+     {PseudoOpcode::SUB,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::SUBI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::SUBR}}}},
 };
 
 std::map<std::string, uint8_t> registers = {
@@ -48,7 +73,7 @@ void Preprocessor::handle_opcode(char *text) {
   if (opcodes.contains(opcode))
     this->current_instruction->opcode = opcodes[opcode];
   if (pseudoOpcodes.contains(opcode))
-    this->current_instruction->pseudoOpcode = pseudoOpcodes[opcode];
+    this->current_instruction->pseudoOpcode = pseudoOpcodes[opcode].opcode;
 }
 
 /**
@@ -110,23 +135,45 @@ void Preprocessor::build_intermediate_rom() {
     for (inst_t *inst : inst_list) {
       // transform inst_t into raw bytes
       if (inst->pseudoOpcode != PseudoOpcode::NONE) {
-        switch (inst->pseudoOpcode) {
-        case PseudoOpcode::MOV: {
-          if (inst->arguments.size() != 2) {
-            throw std::invalid_argument(
-                "pseudo-op mov has invalid number of arguments");
+        // for every pseudo-opcode
+        for (const auto &[_, pseudoData] : pseudoOpcodes) {
+          // if the pseudo-opcode matches our opcode
+          if (pseudoData.opcode == inst->pseudoOpcode) {
+            int matched_n_predicates = 0;
+            std::vector<int> matched_arg_pos = {};
+            // for every predicate of that pseudo-opcode
+            for (pseudo_predicate_t predicate : pseudoData.predicates) {
+              if (inst->arguments.size() < predicate.arg_pos + 1) {
+                throw std::invalid_argument(
+                    "pseudo-opcode has less arguments than expected");
+              }
+              // if the argument type matches the predicate
+              if (inst->arguments[predicate.arg_pos]->type ==
+                      predicate.arg_type &&
+                  std::find(matched_arg_pos.begin(), matched_arg_pos.end(),
+                            predicate.arg_pos) == matched_arg_pos.end()) {
+                // this is our opcode
+                inst->opcode = predicate.opcode;
+                inst->pseudoOpcode = PseudoOpcode::NONE;
+                matched_n_predicates++;
+              }
+            }
+            if (matched_n_predicates < pseudoData.must_match_n_predicates) {
+              throw std::invalid_argument(
+                  "pseudo-opcode has less arguments than expected (not enough "
+                  "predicates matched)");
+            }
           }
-          if (inst->arguments[0]->type == ArgType::NUMBER) {
-            inst->opcode = Opcode::MOVI;
-          }
-          if (inst->arguments[0]->type == ArgType::REGISTER) {
-            inst->opcode = Opcode::MOVR;
-          }
-          break;
         }
-        default: {
-          throw std::invalid_argument("unknown pseudo-opcode");
-        }
+
+        // if after all that we STILL don't have the right pseudo-opcode
+        if (inst->pseudoOpcode != PseudoOpcode::NONE) {
+          // bail
+          throw std::invalid_argument(
+              (std::stringstream()
+               << "invalid pseudo-opcode "
+               << std::to_string(static_cast<int>(inst->pseudoOpcode)))
+                  .str());
         }
       }
 
