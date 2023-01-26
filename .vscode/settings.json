@@ -10,7 +10,4 @@
         }
     },
     "terminal.integrated.defaultProfile.windows": "Cygwin",
-    "files.associations": {
-        "stdexcept": "cpp"
-    }
 }

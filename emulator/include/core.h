@@ -12,19 +12,21 @@ namespace omam8 {
             std::string displayName;
             unsigned int argsLength;
             void (*handler)(uint8_t *args);
-        } Opcode;
+        } EmuOpcode;
 
         enum Register : unsigned int {
-            PC = (1u << 1),
-            SP = (1u << 2),
-            A = (1u << 3),
-            B = (1u << 4),
-            C = (1u << 5),
-            D = (1u << 6),
+            PC = 0b010000,
+            SP = 0b100000,
+            A = 0b000001,
+            B = 0b000010,
+            C = 0b000100,
+            D = 0b001000,
         };
 
         uint8_t get_register(Register reg);
+        void set_register(Register reg, uint8_t value);
         uint16_t get_combined_register(unsigned int reg);
+        void set_combined_register(unsigned int reg, uint16_t value);
 
         void init();
         void handle_opcode();

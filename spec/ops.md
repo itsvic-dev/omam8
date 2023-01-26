@@ -9,7 +9,7 @@
 - `mov` (`0b1000000X`) - copy from **src** to register **dst**
     - `movi` (`0b10000000`) - **src** is an *immediate*
     - `movr` (`0b10000001`) - **src** is a register
-- `add` (`0b0100000X`) - add from **src** into register **dst**
+- `add` (`0b0100000X`) - add **src** into register **dst**
     - `addi` (`0b01000000`) - **src** is an *immediate*
     - `addr` (`0b01000001`) - **src** is a register
 - `sub` (`0b0110000X`) - subtract **src** from register **dst**

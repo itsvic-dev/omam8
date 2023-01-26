@@ -10,5 +10,7 @@ if (DEFINED YY_DEBUG)
     add_definitions(-DYY_DEBUG)
 endif()
 
+include_directories(shared)
+
 add_subdirectory(emulator)
 add_subdirectory(assembler)

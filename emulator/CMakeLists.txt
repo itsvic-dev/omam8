@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/core.cpp
     src/rom.cpp
     src/opcodes/simple.cpp
+    src/opcodes/math.cpp
 )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
