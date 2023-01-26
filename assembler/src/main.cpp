@@ -3,6 +3,8 @@
 // functions
 #include "parser.c"
 #include <cstdio>
+#include <iostream>
+#include <exception>
 
 int main() {
   while (yyparse())

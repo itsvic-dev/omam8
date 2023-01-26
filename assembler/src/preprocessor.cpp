@@ -8,6 +8,7 @@
 #include <list>
 #include <sstream>
 #include <stdexcept>
+#include <cstring>
 
 Preprocessor::Preprocessor() {}
 
@@ -23,12 +24,21 @@ std::map<std::string, Opcode> opcodes = {
     {"hlt", Opcode::HLT},
     {"movi", Opcode::MOVI},
     {"movr", Opcode::MOVR},
+    {"pushi", Opcode::PUSHI},
+    {"pushr", Opcode::PUSHR},
+    {"popr", Opcode::POPR},
+    {"popa", Opcode::POPA},
+    {"rioia", Opcode::RIOIA},
+    {"rioir", Opcode::RIOIR},
+    {"riora", Opcode::RIORA},
+    {"riorr", Opcode::RIORR},
 };
 
 typedef struct pseudo_predicate {
   int arg_pos;
   Preprocessor::ArgType arg_type;
   Opcode opcode;
+  struct pseudo_predicate *requirement = nullptr;
 } pseudo_predicate_t;
 
 typedef struct pseudo {
@@ -36,6 +46,14 @@ typedef struct pseudo {
   std::list<pseudo_predicate_t> predicates;
   int must_match_n_predicates = 1;
 } pseudo_t;
+
+// RIO/WIO is more complicated than other pseudo-opcodes
+pseudo_predicate_t rio_i = {0, Preprocessor::ArgType::NUMBER, Opcode::RIOIA};
+pseudo_predicate_t rio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::RIORA};
+pseudo_predicate_t wio_a = {0, Preprocessor::ArgType::ADDRESS, Opcode::WIOAI};
+pseudo_predicate_t wio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::WIORI};
+
+pseudo_predicate_t empty_predicate = {0, Preprocessor::ArgType::ADDRESS, Opcode::NOP};
 
 std::map<std::string, pseudo_t> pseudoOpcodes = {
     {"mov",
@@ -50,6 +68,28 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::SUB,
       {{0, Preprocessor::ArgType::NUMBER, Opcode::SUBI},
        {0, Preprocessor::ArgType::REGISTER, Opcode::SUBR}}}},
+    {"push",
+     {PseudoOpcode::PUSH,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::PUSHI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::PUSHR}}}},
+    {"pop",
+     {PseudoOpcode::POP,
+      {{0, Preprocessor::ArgType::REGISTER, Opcode::POPR},
+       {0, Preprocessor::ArgType::ADDRESS, Opcode::POPA}}}},
+    {"rio",
+     {PseudoOpcode::RIO,
+      {rio_i, rio_r,
+       {1, Preprocessor::ArgType::ADDRESS, Opcode::RIOIA, &rio_i},
+       {1, Preprocessor::ArgType::ADDRESS, Opcode::RIORA, &rio_r},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::RIOIR, &rio_i},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::RIORR, &rio_r}}, 2}},
+    {"wio",
+     {PseudoOpcode::WIO,
+      {wio_a, wio_r,
+       {1, Preprocessor::ArgType::NUMBER, Opcode::WIOAI, &wio_a},
+       {1, Preprocessor::ArgType::NUMBER, Opcode::WIORI, &wio_r},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::WIOAR, &wio_a},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::WIORR, &wio_r}}, 2}},
 };
 
 std::map<std::string, uint8_t> registers = {
@@ -141,6 +181,7 @@ void Preprocessor::build_intermediate_rom() {
           if (pseudoData.opcode == inst->pseudoOpcode) {
             int matched_n_predicates = 0;
             std::vector<int> matched_arg_pos = {};
+            std::vector<pseudo_predicate_t> matched_predicates = {};
             // for every predicate of that pseudo-opcode
             for (pseudo_predicate_t predicate : pseudoData.predicates) {
               if (inst->arguments.size() < predicate.arg_pos + 1) {
@@ -152,10 +193,27 @@ void Preprocessor::build_intermediate_rom() {
                       predicate.arg_type &&
                   std::find(matched_arg_pos.begin(), matched_arg_pos.end(),
                             predicate.arg_pos) == matched_arg_pos.end()) {
+                // if the predicate has a requirement
+                if (predicate.requirement != nullptr) {
+                  // this is so cursed yet i felt like this is the easiest solution for me to write as of right now
+                  // yes it looks like absolute garbage
+                  bool check_success = false;
+                  for (pseudo_predicate_t r : matched_predicates) {
+                    if (memcmp(predicate.requirement, &r, sizeof(pseudo_predicate_t)) == 0) {
+                      check_success = true;
+                      break;
+                    }
+                  }
+                  if (!check_success) {
+                    continue;
+                  }
+                }
                 // this is our opcode
                 inst->opcode = predicate.opcode;
                 inst->pseudoOpcode = PseudoOpcode::NONE;
                 matched_n_predicates++;
+                matched_arg_pos.push_back(predicate.arg_pos);
+                matched_predicates.push_back(predicate);
               }
             }
             if (matched_n_predicates < pseudoData.must_match_n_predicates) {

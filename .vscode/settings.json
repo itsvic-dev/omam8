@@ -1,0 +1,16 @@
+{
+    "C_Cpp.errorSquiggles": "disabled",
+    "terminal.integrated.profiles.windows": {
+        "Cygwin": {
+            "path": "C:\\cygwin64\\bin\\bash.exe",
+            "env": {
+                "CHERE_INVOKING": "1"
+            },
+            "args": ["-l"]
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Cygwin",
+    "files.associations": {
+        "stdexcept": "cpp"
+    }
+}
