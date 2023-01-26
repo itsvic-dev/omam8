@@ -7,6 +7,7 @@
 #include <cstring>
 
 #include <opcodes/simple.h>
+#include <opcodes/stack.h>
 #include <opcodes/math.h>
 #include <shared.h>
 
@@ -23,6 +24,10 @@ std::map<Opcode, EmuOpcode> opcodes {
     { Opcode::ADDR, { "addr", 2, omam8::Opcodes::addr } },
     { Opcode::SUBI, { "subi", 2, omam8::Opcodes::subi } },
     { Opcode::SUBR, { "subr", 2, omam8::Opcodes::subr } },
+    { Opcode::PUSHI, { "pushi", 1, omam8::Opcodes::pushi } },
+    { Opcode::PUSHR, { "pushr", 1, omam8::Opcodes::pushr } },
+    { Opcode::POPA, { "popa", 2, omam8::Opcodes::popa } },
+    { Opcode::POPR, { "popr", 1, omam8::Opcodes::popr } },
 };
 
 std::map<Register, uint16_t> registers_16b {
@@ -60,11 +65,24 @@ uint16_t omam8::Core::get_combined_register(unsigned int reg) {
         return registers_16b[static_cast<Register>(reg)];
     }
 
-    return 0xFF; // TODO: combined registers
+    throw std::runtime_error("todo: get combined registers");
 }
 
 void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
-    throw std::runtime_error("set_combined_register: todo");
+    if (reg == Register::PC || reg == Register::SP) {
+        registers_16b[static_cast<Register>(reg)] = value;
+        return;
+    }
+
+    throw std::runtime_error("todo: set combined registers");
+}
+
+uint8_t omam8::Core::get_mram(uint16_t addr) {
+    return memory[addr];
+}
+
+void omam8::Core::set_mram(uint16_t addr, uint8_t value) {
+    memory[addr] = value;
 }
 
 void omam8::Core::init() {

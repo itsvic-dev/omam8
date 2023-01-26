@@ -28,6 +28,9 @@ namespace omam8 {
         uint16_t get_combined_register(unsigned int reg);
         void set_combined_register(unsigned int reg, uint16_t value);
 
+        uint8_t get_mram(uint16_t addr);
+        void set_mram(uint16_t addr, uint8_t value);
+
         void init();
         void handle_opcode();
         void start_loop();

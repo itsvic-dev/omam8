@@ -12,5 +12,9 @@ endif()
 
 include_directories(shared)
 
+set(SHARED_SRC
+    ${CMAKE_CURRENT_SOURCE_DIR}/shared/helpers.cpp
+)
+
 add_subdirectory(emulator)
 add_subdirectory(assembler)
