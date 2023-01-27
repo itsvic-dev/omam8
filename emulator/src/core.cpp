@@ -1,3 +1,4 @@
+#include "helpers.h"
 #include <core.h>
 #include <cstdlib>
 #include <cstring>
@@ -11,6 +12,7 @@
 #include <opcodes/simple.h>
 #include <opcodes/stack.h>
 #include <shared.h>
+#include <stdexcept>
 
 using namespace omam8::Core;
 
@@ -66,7 +68,15 @@ uint16_t omam8::Core::get_combined_register(unsigned int reg) {
     return registers_16b[static_cast<Register>(reg)];
   }
 
-  throw std::runtime_error("todo: get combined registers");
+  if (reg == (Register::B | Register::A)) {
+    return join_uint8_to_16(registers_8b[B], registers_8b[A]);
+  }
+
+  if (reg == (Register::D | Register::C)) {
+    return join_uint8_to_16(registers_8b[D], registers_8b[C]);
+  }
+
+  throw std::logic_error("invalid combined register");
 }
 
 void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
@@ -75,7 +85,21 @@ void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
     return;
   }
 
-  throw std::runtime_error("todo: set combined registers");
+  uint16_to_8_t value_8b = split_uint16_to_8(value);
+
+  if (reg == (Register::B | Register::A)) {
+    registers_8b[B] = value_8b.lower;
+    registers_8b[A] = value_8b.upper;
+    return;
+  }
+
+  if (reg == (Register::D | Register::C)) {
+    registers_8b[D] = value_8b.lower;
+    registers_8b[C] = value_8b.upper;
+    return;
+  }
+
+  throw std::logic_error("invalid combined register");
 }
 
 uint8_t omam8::Core::get_mram(uint16_t addr) { return memory[addr]; }
