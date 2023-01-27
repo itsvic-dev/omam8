@@ -23,6 +23,8 @@ using namespace omam8::Core;
 std::map<Opcode, EmuOpcode> opcodes{
     {Opcode::NOP, {"nop", 0, omam8::Opcodes::nop}},
     {Opcode::HLT, {"hlt", 0, omam8::Opcodes::hlt}},
+    {Opcode::MOVI, {"movi", 2, omam8::Opcodes::movi}},
+    {Opcode::MOVR, {"movr", 2, omam8::Opcodes::movr}},
     {Opcode::ADDI, {"addi", 2, omam8::Opcodes::addi}},
     {Opcode::ADDR, {"addr", 2, omam8::Opcodes::addr}},
     {Opcode::SUBI, {"subi", 2, omam8::Opcodes::subi}},

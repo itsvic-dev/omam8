@@ -7,6 +7,8 @@ namespace omam8 {
 namespace Opcodes {
 void nop(uint8_t *args);
 void hlt(uint8_t *args);
+void movi(uint8_t *args);
+void movr(uint8_t *args);
 } // namespace Opcodes
 } // namespace omam8
 
