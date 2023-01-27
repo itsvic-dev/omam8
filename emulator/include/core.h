@@ -8,10 +8,11 @@
 
 namespace omam8 {
 namespace Core {
-typedef struct {
+typedef struct EmuOpcode {
   std::string displayName;
   unsigned int argsLength;
   void (*handler)(uint8_t *args);
+  bool manipulatesPC = false;
 } EmuOpcode;
 
 enum Register : unsigned int {

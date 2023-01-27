@@ -1,6 +1,7 @@
 # Definitions
-- *immediate* - a byte stored in the ROM.
-- *16-bit immediate* - 2 bytes stored in the ROM, forming a 16-bit LE word.
+- *immediate* - a byte stored in the ROM
+- *16-bit immediate* - 2 bytes stored in the ROM, forming a 16-bit LE word
+- address - a *16-bit immediate*
 
 # Opcodes
 
@@ -35,3 +36,6 @@
     - `wioar` (`0b00111001`) - **src** is an address, **dst** is a register
     - `wiori` (`0b00111010`) - **src** is a register, **dst** is an *immediate*
     - `wiorr` (`0b00111011`) - **src** is a register, **dst** is a register
+- `jmp` (`0b1011000X`) - jump to **dst**
+    - `jmpa` (`0b10110000`) - **dst** is an address
+    - `jmpr` (`0b10110001`) - **dst** is a combined register

@@ -3,12 +3,12 @@
 #include "rom.h"
 #include "shared.h"
 #include <algorithm>
+#include <cstring>
 #include <exception>
 #include <iostream>
 #include <list>
 #include <sstream>
 #include <stdexcept>
-#include <cstring>
 
 Preprocessor::Preprocessor() {}
 
@@ -20,18 +20,13 @@ void Preprocessor::handle_new_label(char *text) {
 }
 
 std::map<std::string, Opcode> opcodes = {
-    {"nop", Opcode::NOP},
-    {"hlt", Opcode::HLT},
-    {"movi", Opcode::MOVI},
-    {"movr", Opcode::MOVR},
-    {"pushi", Opcode::PUSHI},
-    {"pushr", Opcode::PUSHR},
-    {"popr", Opcode::POPR},
-    {"popa", Opcode::POPA},
-    {"rioia", Opcode::RIOIA},
-    {"rioir", Opcode::RIOIR},
-    {"riora", Opcode::RIORA},
-    {"riorr", Opcode::RIORR},
+    {"nop", Opcode::NOP},     {"hlt", Opcode::HLT},
+    {"movi", Opcode::MOVI},   {"movr", Opcode::MOVR},
+    {"pushi", Opcode::PUSHI}, {"pushr", Opcode::PUSHR},
+    {"popr", Opcode::POPR},   {"popa", Opcode::POPA},
+    {"rioia", Opcode::RIOIA}, {"rioir", Opcode::RIOIR},
+    {"riora", Opcode::RIORA}, {"riorr", Opcode::RIORR},
+    {"jmpa", Opcode::JMPA},   {"jmpr", Opcode::JMPR},
 };
 
 typedef struct pseudo_predicate {
@@ -53,7 +48,8 @@ pseudo_predicate_t rio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::RIORA};
 pseudo_predicate_t wio_a = {0, Preprocessor::ArgType::ADDRESS, Opcode::WIOAI};
 pseudo_predicate_t wio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::WIORI};
 
-pseudo_predicate_t empty_predicate = {0, Preprocessor::ArgType::ADDRESS, Opcode::NOP};
+pseudo_predicate_t empty_predicate = {0, Preprocessor::ArgType::ADDRESS,
+                                      Opcode::NOP};
 
 std::map<std::string, pseudo_t> pseudoOpcodes = {
     {"mov",
@@ -78,18 +74,26 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
        {0, Preprocessor::ArgType::ADDRESS, Opcode::POPA}}}},
     {"rio",
      {PseudoOpcode::RIO,
-      {rio_i, rio_r,
+      {rio_i,
+       rio_r,
        {1, Preprocessor::ArgType::ADDRESS, Opcode::RIOIA, &rio_i},
        {1, Preprocessor::ArgType::ADDRESS, Opcode::RIORA, &rio_r},
        {1, Preprocessor::ArgType::REGISTER, Opcode::RIOIR, &rio_i},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::RIORR, &rio_r}}, 2}},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::RIORR, &rio_r}},
+      2}},
     {"wio",
      {PseudoOpcode::WIO,
-      {wio_a, wio_r,
+      {wio_a,
+       wio_r,
        {1, Preprocessor::ArgType::NUMBER, Opcode::WIOAI, &wio_a},
        {1, Preprocessor::ArgType::NUMBER, Opcode::WIORI, &wio_r},
        {1, Preprocessor::ArgType::REGISTER, Opcode::WIOAR, &wio_a},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::WIORR, &wio_r}}, 2}},
+       {1, Preprocessor::ArgType::REGISTER, Opcode::WIORR, &wio_r}},
+      2}},
+    {"jmp",
+     {PseudoOpcode::JMP,
+      {{0, Preprocessor::ArgType::ADDRESS, Opcode::JMPA},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::JMPR}}}},
 };
 
 std::map<std::string, uint8_t> registers = {
@@ -195,11 +199,13 @@ void Preprocessor::build_intermediate_rom() {
                             predicate.arg_pos) == matched_arg_pos.end()) {
                 // if the predicate has a requirement
                 if (predicate.requirement != nullptr) {
-                  // this is so cursed yet i felt like this is the easiest solution for me to write as of right now
+                  // this is so cursed yet i felt like this is the easiest
+                  // solution for me to write as of right now.
                   // yes it looks like absolute garbage
                   bool check_success = false;
                   for (pseudo_predicate_t r : matched_predicates) {
-                    if (memcmp(predicate.requirement, &r, sizeof(pseudo_predicate_t)) == 0) {
+                    if (memcmp(predicate.requirement, &r,
+                               sizeof(pseudo_predicate_t)) == 0) {
                       check_success = true;
                       break;
                     }
@@ -240,7 +246,7 @@ void Preprocessor::build_intermediate_rom() {
       for (arg_t *arg : inst->arguments) {
         switch (arg->type) {
         case ArgType::NUMBER: {
-          int value = std::stoi(arg->contents);
+          int value = std::stoi(arg->contents, nullptr, 0);
           stage2_rom[label].push_back(static_cast<uint8_t>(value));
           break;
         }
@@ -254,6 +260,13 @@ void Preprocessor::build_intermediate_rom() {
         }
         case ArgType::REGISTER: {
           stage2_rom[label].push_back(registers[arg->contents]);
+          break;
+        }
+        case ArgType::ADDRESS: {
+          int value = std::stoi(arg->contents, nullptr, 0);
+          uint16_to_8_t addr = split_uint16_to_8(static_cast<uint16_t>(value));
+          stage2_rom[label].push_back(addr.lower);
+          stage2_rom[label].push_back(addr.upper);
           break;
         }
         default: {

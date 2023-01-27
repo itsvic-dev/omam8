@@ -6,6 +6,7 @@
 #include <map>
 #include <sstream>
 
+#include <opcodes/jumps.h>
 #include <opcodes/math.h>
 #include <opcodes/simple.h>
 #include <opcodes/stack.h>
@@ -28,6 +29,8 @@ std::map<Opcode, EmuOpcode> opcodes{
     {Opcode::PUSHR, {"pushr", 1, omam8::Opcodes::pushr}},
     {Opcode::POPA, {"popa", 2, omam8::Opcodes::popa}},
     {Opcode::POPR, {"popr", 1, omam8::Opcodes::popr}},
+    {Opcode::JMPA, {"jmpa", 2, omam8::Opcodes::jmpa, true}},
+    {Opcode::JMPR, {"jmpr", 1, omam8::Opcodes::jmpr, true}},
 };
 
 std::map<Register, uint16_t> registers_16b{
@@ -93,7 +96,8 @@ void omam8::Core::handle_opcode() {
   EmuOpcode opcode = opcodes[static_cast<Opcode>(memory[pc])];
   std::cout << opcode.displayName << "\n";
   opcode.handler(memory + pc + 1u);
-  registers_16b[Register::PC] = pc + 1u + opcode.argsLength;
+  if (!opcode.manipulatesPC)
+    registers_16b[Register::PC] = pc + 1u + opcode.argsLength;
 }
 
 void print_state();

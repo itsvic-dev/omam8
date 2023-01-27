@@ -25,6 +25,8 @@ enum class Opcode : uint8_t {
   WIOAR = 0b00111001,
   WIORI = 0b00111010,
   WIORR = 0b00111011,
+  JMPA = 0b10110000,
+  JMPR = 0b10110001,
 };
 
 /**
@@ -41,6 +43,7 @@ enum class PseudoOpcode : int {
   POP,
   RIO,
   WIO,
+  JMP,
 };
 
 #endif // SHARED_H
