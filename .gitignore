@@ -54,6 +54,7 @@ _deps
 
 build/
 *.oasm
+!examples/*.oasm
 *.s
 *.png
 !assets/*.png

@@ -1,0 +1,23 @@
+; write 1 to all IO pins
+loop:
+    ; a - current IO pin
+    ; b - sio argument
+    ; sio technically doesn't support this because i fucked up
+    ; so we have to construct and execute sio at runtime
+    mov %a, %b
+    shl 2, %b
+
+    ; we don't have an OR instruction so we have to use add, not great but whatever
+    add 2, %b
+
+    ; set the pin to write mode
+    sio %b
+
+    ; write 1 to the pin
+    ; we can't write an immediate directly to a pin so this has to do
+    mov 1, %b
+    wio %b, %a
+
+    ; and we start again
+    add 1, %a
+    jmp .loop

@@ -6,6 +6,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/core.cpp
     src/rom.cpp
+    src/opcodes/io.cpp
     src/opcodes/jumps.cpp
     src/opcodes/math.cpp
     src/opcodes/simple.cpp

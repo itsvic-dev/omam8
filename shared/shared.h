@@ -8,6 +8,8 @@ enum class Opcode : uint8_t {
   HLT = 0b11111111,
   MOVI = 0b10000000,
   MOVR = 0b10000001,
+  MOV16A = 0b10001000,
+  MOV16R = 0b10001001,
   ADDI = 0b01000000,
   ADDR = 0b01000001,
   SUBI = 0b01100000,
@@ -16,7 +18,8 @@ enum class Opcode : uint8_t {
   PUSHR = 0b10100001,
   POPR = 0b11100000,
   POPA = 0b11100001,
-  SIO = 0b00010000,
+  SIOI = 0b00010000,
+  SIOR = 0b00010001,
   RIOIA = 0b00110000,
   RIOIR = 0b00110001,
   RIORA = 0b00110010,
@@ -27,6 +30,10 @@ enum class Opcode : uint8_t {
   WIORR = 0b00111011,
   JMPA = 0b10110000,
   JMPR = 0b10110001,
+  SHLI = 0b11110000,
+  SHLR = 0b11110001,
+  SHRI = 0b11111000,
+  SHRR = 0b11111001,
 };
 
 /**
@@ -37,13 +44,17 @@ enum class Opcode : uint8_t {
 enum class PseudoOpcode : int {
   NONE,
   MOV,
+  MOV16,
   ADD,
   SUB,
   PUSH,
   POP,
+  SIO,
   RIO,
   WIO,
   JMP,
+  SHL,
+  SHR,
 };
 
 #endif // SHARED_H

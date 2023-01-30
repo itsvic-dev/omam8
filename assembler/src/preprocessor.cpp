@@ -22,11 +22,17 @@ void Preprocessor::handle_new_label(char *text) {
 std::map<std::string, Opcode> opcodes = {
     {"nop", Opcode::NOP},     {"hlt", Opcode::HLT},
     {"movi", Opcode::MOVI},   {"movr", Opcode::MOVR},
+    {"mov16a", Opcode::MOV16A},   {"mov16r", Opcode::MOV16R},
     {"pushi", Opcode::PUSHI}, {"pushr", Opcode::PUSHR},
     {"popr", Opcode::POPR},   {"popa", Opcode::POPA},
+    {"sioi", Opcode::SIOI},   {"sior", Opcode::SIOR},
     {"rioia", Opcode::RIOIA}, {"rioir", Opcode::RIOIR},
     {"riora", Opcode::RIORA}, {"riorr", Opcode::RIORR},
+    {"wioai", Opcode::WIOAI}, {"wioar", Opcode::WIOAR},
+    {"wiori", Opcode::WIORI}, {"wiorr", Opcode::WIORR},
     {"jmpa", Opcode::JMPA},   {"jmpr", Opcode::JMPR},
+    {"shli", Opcode::SHLI},   {"shlr", Opcode::SHLR},
+    {"shri", Opcode::SHRI},   {"shrr", Opcode::SHRR},
 };
 
 typedef struct pseudo_predicate {
@@ -56,6 +62,10 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::MOV,
       {{0, Preprocessor::ArgType::NUMBER, Opcode::MOVI},
        {0, Preprocessor::ArgType::REGISTER, Opcode::MOVR}}}},
+    {"mov16",
+     {PseudoOpcode::MOV16,
+      {{0, Preprocessor::ArgType::ADDRESS, Opcode::MOV16A},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::MOV16R}}}},
     {"add",
      {PseudoOpcode::ADD,
       {{0, Preprocessor::ArgType::NUMBER, Opcode::ADDI},
@@ -72,6 +82,10 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::POP,
       {{0, Preprocessor::ArgType::REGISTER, Opcode::POPR},
        {0, Preprocessor::ArgType::ADDRESS, Opcode::POPA}}}},
+    {"sio",
+     {PseudoOpcode::SIO,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::SIOI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::SIOR}}}},
     {"rio",
      {PseudoOpcode::RIO,
       {rio_i,
@@ -94,6 +108,14 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::JMP,
       {{0, Preprocessor::ArgType::ADDRESS, Opcode::JMPA},
        {0, Preprocessor::ArgType::REGISTER, Opcode::JMPR}}}},
+    {"shl",
+     {PseudoOpcode::SHL,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::SHLI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::SHLR}}}},
+    {"shr",
+     {PseudoOpcode::SHR,
+      {{0, Preprocessor::ArgType::NUMBER, Opcode::SHRI},
+       {0, Preprocessor::ArgType::REGISTER, Opcode::SHRR}}}},
 };
 
 std::map<std::string, uint8_t> registers = {
@@ -192,9 +214,13 @@ void Preprocessor::build_intermediate_rom() {
                 throw std::invalid_argument(
                     "pseudo-opcode has less arguments than expected");
               }
+              ArgType type = inst->arguments[predicate.arg_pos]->type;
+              if (type == ArgType::LABEL) {
+                // labels are fancier addresses and should be handled as such
+                type = ArgType::ADDRESS;
+              }
               // if the argument type matches the predicate
-              if (inst->arguments[predicate.arg_pos]->type ==
-                      predicate.arg_type &&
+              if (type == predicate.arg_type &&
                   std::find(matched_arg_pos.begin(), matched_arg_pos.end(),
                             predicate.arg_pos) == matched_arg_pos.end()) {
                 // if the predicate has a requirement

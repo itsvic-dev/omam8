@@ -14,7 +14,12 @@ int main(int argc, char **argv) {
   while (yyparse())
     ;
   Preprocessor &preprocessor = get_preprocessor();
+  try {
   preprocessor.build_intermediate_rom();
+  } catch (std::logic_error exc) {
+    std::cerr << "oopsies an erro rhappened " << exc.what() << "\n";
+    return 1;
+  }
   preprocessor.save_rom(argv[1]);
   return 0;
 }

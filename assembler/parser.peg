@@ -1,5 +1,5 @@
 Program <- (NL* Line NL*)+ EOF
-Line <- (Comment / (LabelStart (SPACE Instruction)? / Instruction) (SPACE* Comment)?)
+Line <- (SPACE* Comment) / ((LabelStart (SPACE Instruction)? / Instruction) (SPACE* Comment)?)
 
 Comment <- ';' (!NL .)* NL
 
