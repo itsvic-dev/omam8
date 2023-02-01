@@ -130,7 +130,8 @@ void omam8::Core::set_mram(uint16_t addr, uint8_t value) {
 }
 
 bool omam8::Core::read_io_pin(int io_pin) {
-  if (io_pin > 31) throw std::logic_error("cannot read from non-existent pin");
+  if (io_pin > 31)
+    throw std::logic_error("cannot read from non-existent pin");
   if (io_pin_modes[io_pin] != READ) {
     throw std::logic_error("cannot read from a pin that isn't in read mode");
   }
@@ -138,7 +139,8 @@ bool omam8::Core::read_io_pin(int io_pin) {
 }
 
 void omam8::Core::write_io_pin(int io_pin, bool value) {
-  if (io_pin > 31) throw std::logic_error("cannot write to non-existent pin");
+  if (io_pin > 31)
+    throw std::logic_error("cannot write to non-existent pin");
   if (io_pin_modes[io_pin] != WRITE) {
     throw std::logic_error("cannot write to a pin that isn't in write mode");
   }
@@ -146,7 +148,8 @@ void omam8::Core::write_io_pin(int io_pin, bool value) {
 }
 
 void omam8::Core::set_io_pin_mode(int io_pin, IOMode mode) {
-  if (io_pin > 31) throw std::logic_error("cannot set mode of non-existent pin");
+  if (io_pin > 31)
+    throw std::logic_error("cannot set mode of non-existent pin");
   io_pin_modes[io_pin] = mode;
   // we clear the pin on state change
   io_pins[io_pin] = false;
@@ -203,12 +206,14 @@ void print_state() {
   std::cout << "D: " << int_to_hex(get_register(D), 2) << "\n";
   std::cout << "IO: ";
   for (int i = 0; i < 32; i++) {
-    std::cout << io_pins[i] ? "1" : "0";
+    std::cout << (io_pins[i] ? "1" : "0");
   }
   std::cout << "\n";
   std::cout << "    ";
   for (int i = 0; i < 32; i++) {
-    std::cout << (io_pin_modes[i] == OFF ? "X" : io_pin_modes[i] == READ ? "R" : "W");
+    std::cout << (io_pin_modes[i] == OFF    ? "X"
+                  : io_pin_modes[i] == READ ? "R"
+                                            : "W");
   }
   std::cout << "\n";
 }

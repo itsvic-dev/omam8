@@ -1,7 +1,6 @@
 #include <core.h>
 #include <opcodes/math.h>
 
-
 void omam8::Opcodes::addi(uint8_t *args) {
   // addi: 0 - immediate, 1 - register
   uint8_t a = args[0];

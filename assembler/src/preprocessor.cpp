@@ -20,19 +20,19 @@ void Preprocessor::handle_new_label(char *text) {
 }
 
 std::map<std::string, Opcode> opcodes = {
-    {"nop", Opcode::NOP},     {"hlt", Opcode::HLT},
-    {"movi", Opcode::MOVI},   {"movr", Opcode::MOVR},
-    {"mov16a", Opcode::MOV16A},   {"mov16r", Opcode::MOV16R},
-    {"pushi", Opcode::PUSHI}, {"pushr", Opcode::PUSHR},
-    {"popr", Opcode::POPR},   {"popa", Opcode::POPA},
-    {"sioi", Opcode::SIOI},   {"sior", Opcode::SIOR},
-    {"rioia", Opcode::RIOIA}, {"rioir", Opcode::RIOIR},
-    {"riora", Opcode::RIORA}, {"riorr", Opcode::RIORR},
-    {"wioai", Opcode::WIOAI}, {"wioar", Opcode::WIOAR},
-    {"wiori", Opcode::WIORI}, {"wiorr", Opcode::WIORR},
-    {"jmpa", Opcode::JMPA},   {"jmpr", Opcode::JMPR},
-    {"shli", Opcode::SHLI},   {"shlr", Opcode::SHLR},
-    {"shri", Opcode::SHRI},   {"shrr", Opcode::SHRR},
+    {"nop", Opcode::NOP},       {"hlt", Opcode::HLT},
+    {"movi", Opcode::MOVI},     {"movr", Opcode::MOVR},
+    {"mov16a", Opcode::MOV16A}, {"mov16r", Opcode::MOV16R},
+    {"pushi", Opcode::PUSHI},   {"pushr", Opcode::PUSHR},
+    {"popr", Opcode::POPR},     {"popa", Opcode::POPA},
+    {"sioi", Opcode::SIOI},     {"sior", Opcode::SIOR},
+    {"rioia", Opcode::RIOIA},   {"rioir", Opcode::RIOIR},
+    {"riora", Opcode::RIORA},   {"riorr", Opcode::RIORR},
+    {"wioai", Opcode::WIOAI},   {"wioar", Opcode::WIOAR},
+    {"wiori", Opcode::WIORI},   {"wiorr", Opcode::WIORR},
+    {"jmpa", Opcode::JMPA},     {"jmpr", Opcode::JMPR},
+    {"shli", Opcode::SHLI},     {"shlr", Opcode::SHLR},
+    {"shri", Opcode::SHRI},     {"shrr", Opcode::SHRR},
 };
 
 typedef struct pseudo_predicate {

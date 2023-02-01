@@ -3,7 +3,6 @@
 #include <iostream>
 #include <opcodes/stack.h>
 
-
 void omam8::Opcodes::pushi(uint8_t *args) {
   // pushi: 0 - immediate
   uint8_t value = args[0];
