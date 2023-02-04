@@ -36,7 +36,7 @@ ROMData omam8::ROM::get_rom(std::string file) {
   if (rawData.size() < (9 + 0x4000 + (0x4000 * banks)))
     throw std::length_error("ROM is smaller than expected by bank amount");
 
-  uint8_t *data = rawData.data() + 9;
-
+  uint8_t *data = static_cast<uint8_t *>(malloc(rawData.size() - 9));
+  memcpy(data, rawData.data() + 9, rawData.size() - 9);
   return {static_cast<char>(banks), data};
 }
