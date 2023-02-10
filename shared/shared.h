@@ -34,6 +34,10 @@ enum class Opcode : uint8_t {
   SHLR = 0b11110001,
   SHRI = 0b11111000,
   SHRR = 0b11111001,
+  PEEKR = 0b10010000,
+  PEEKA = 0b10010001,
+  POKER = 0b10011000,
+  POKEA = 0b10011001,
 };
 
 /**
@@ -55,6 +59,8 @@ enum class PseudoOpcode : int {
   JMP,
   SHL,
   SHR,
+  POKE,
+  PEEK,
 };
 
 #endif // SHARED_H

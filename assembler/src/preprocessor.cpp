@@ -33,6 +33,8 @@ std::map<std::string, Opcode> opcodes = {
     {"jmpa", Opcode::JMPA},     {"jmpr", Opcode::JMPR},
     {"shli", Opcode::SHLI},     {"shlr", Opcode::SHLR},
     {"shri", Opcode::SHRI},     {"shrr", Opcode::SHRR},
+    {"peekr", Opcode::PEEKR},   {"peeka", Opcode::PEEKA},
+    {"poker", Opcode::POKER},   {"pokea", Opcode::POKEA},
 };
 
 typedef struct pseudo_predicate {
@@ -116,6 +118,14 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::SHR,
       {{0, Preprocessor::ArgType::NUMBER, Opcode::SHRI},
        {0, Preprocessor::ArgType::REGISTER, Opcode::SHRR}}}},
+    {"peek",
+     {PseudoOpcode::PEEK,
+      {{0, Preprocessor::ArgType::REGISTER, Opcode::PEEKR},
+       {0, Preprocessor::ArgType::ADDRESS, Opcode::PEEKA}}}},
+    {"poke",
+     {PseudoOpcode::POKE,
+      {{1, Preprocessor::ArgType::REGISTER, Opcode::POKER},
+       {1, Preprocessor::ArgType::ADDRESS, Opcode::POKEA}}}},
 };
 
 std::map<std::string, uint8_t> registers = {

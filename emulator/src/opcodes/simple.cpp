@@ -36,3 +36,33 @@ void omam8::Opcodes::mov16r(uint8_t *args) {
   uint16_t value = omam8::Core::get_combined_register(reg1);
   omam8::Core::set_combined_register(reg2, value);
 }
+
+void omam8::Opcodes::peekr(uint8_t *args) {
+  // peekr: 0 - combined register, 1 - register
+  uint16_t cr = omam8::Core::get_combined_register(args[0]);
+  uint8_t value = omam8::Core::get_mram(cr);
+  omam8::Core::set_register(static_cast<omam8::Core::Register>(args[1]), value);
+}
+
+void omam8::Opcodes::peeka(uint8_t *args) {
+  // peeka: 0 - address, 2 - register
+  uint16_t addr = join_uint8_to_16(args[0], args[1]);
+  uint8_t value = omam8::Core::get_mram(addr);
+  omam8::Core::set_register(static_cast<omam8::Core::Register>(args[2]), value);
+}
+
+void omam8::Opcodes::poker(uint8_t *args) {
+  // poker: 0 - register, 1 - combined register
+  uint8_t value =
+      omam8::Core::get_register(static_cast<omam8::Core::Register>(args[0]));
+  uint16_t addr = omam8::Core::get_combined_register(args[1]);
+  omam8::Core::set_mram(addr, value);
+}
+
+void omam8::Opcodes::pokea(uint8_t *args) {
+  // pokea: 0 - register, 1 - address
+  uint8_t value =
+      omam8::Core::get_register(static_cast<omam8::Core::Register>(args[0]));
+  uint16_t addr = join_uint8_to_16(args[1], args[2]);
+  omam8::Core::set_mram(addr, value);
+}

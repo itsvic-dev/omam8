@@ -1,0 +1,9 @@
+; this example demonstrates both bank switching support
+; and behaviour on reading invalid banks.
+; the assembler doesn't support assembling multiple banks yet
+
+mov 2, %a
+poke %a, [0xC000]
+peek [0xC000], %b
+; if the value of B is 2, the bank switch was incorrect and a write to ROM was incorrectly emulated
+; if the value of B is 0xFF, the bank switch was correct and an invalid bank was correctly emulated

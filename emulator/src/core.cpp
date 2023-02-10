@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
+#include <ios>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -52,6 +53,10 @@ std::map<Opcode, EmuOpcode> opcodes{
     {Opcode::SHLR, {"shlr", 2, omam8::Opcodes::shlr}},
     {Opcode::SHRI, {"shri", 2, omam8::Opcodes::shri}},
     {Opcode::SHRR, {"shrr", 2, omam8::Opcodes::shrr}},
+    {Opcode::PEEKR, {"peekr", 2, omam8::Opcodes::peekr}},
+    {Opcode::PEEKA, {"peeka", 3, omam8::Opcodes::peeka}},
+    {Opcode::POKER, {"poker", 2, omam8::Opcodes::poker}},
+    {Opcode::POKEA, {"pokea", 3, omam8::Opcodes::pokea}},
 };
 
 std::map<Register, uint16_t> registers_16b{
@@ -126,6 +131,20 @@ void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
 uint8_t omam8::Core::get_mram(uint16_t addr) { return memory[addr]; }
 
 void omam8::Core::set_mram(uint16_t addr, uint8_t value) {
+  if (addr >= 0x8000 && addr < 0xC000) {
+    std::cerr << "ignoring write to RAM address " << std::hex << addr
+              << std::endl;
+    return;
+  }
+  if (addr >= 0xC000) {
+    // bank switch
+    if (value >= rom_data.banks) {
+      memset(memory + 0xC000, 0xFF, 0xFFFF - 0xC000);
+    } else {
+      throw std::logic_error("switching banks isn't fully implemented yet!!!");
+    }
+    return;
+  }
   memory[addr] = value;
 }
 

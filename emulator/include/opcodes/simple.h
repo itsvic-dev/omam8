@@ -11,6 +11,10 @@ void movi(uint8_t *args);
 void movr(uint8_t *args);
 void mov16a(uint8_t *args);
 void mov16r(uint8_t *args);
+void peekr(uint8_t *args);
+void peeka(uint8_t *args);
+void poker(uint8_t *args);
+void pokea(uint8_t *args);
 } // namespace Opcodes
 } // namespace omam8
 
