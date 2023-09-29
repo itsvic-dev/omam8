@@ -1,23 +1,16 @@
 ; write 1 to all IO pins
+
 loop:
-    ; a - current IO pin
-    ; b - sio argument
-    ; sio technically doesn't support this because i fucked up
-    ; so we have to construct and execute sio at runtime
-    mov %a, %b
-    shl 2, %b
+    ; a - target pin
+    ; b - whatever else
 
-    ; we don't have an OR instruction so we have to use add, not great but whatever
-    add 2, %b
+    mov %a, %b ; load pin into B
+    shl 2, %b ; shift it to the left by 2 bits
+    add 2, %b ; add 0b10 to the end of b
+    sio %b ; set pin mode
 
-    ; set the pin to write mode
-    sio %b
+    mov 1, %b ; load 1 into B
+    wio %b, %a ; write %b into pin %a
 
-    ; write 1 to the pin
-    ; we can't write an immediate directly to a pin so this has to do
-    mov 1, %b
-    wio %b, %a
-
-    ; and we start again
-    add 1, %a
+    add 1, %a ; increment pin counter
     jmp .loop
