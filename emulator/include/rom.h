@@ -2,6 +2,7 @@
 #define ROM_H
 
 #include <string>
+#include <cstdint>
 
 namespace omam8 {
 namespace ROM {
