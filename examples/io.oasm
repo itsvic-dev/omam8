@@ -6,7 +6,7 @@ loop:
 
     mov %a, %b ; load pin into B
     shl 2, %b ; shift it to the left by 2 bits
-    add 2, %b ; add 0b10 to the end of b
+    or 2, %b ; b | 0b10
     sio %b ; set pin mode
 
     mov 1, %b ; load 1 into B
