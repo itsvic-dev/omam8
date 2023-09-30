@@ -37,6 +37,10 @@ enum class Opcode : uint8_t {
   WIORR = 0b00111011,
   JMPA = 0b10110000,
   JMPR = 0b10110001,
+  JEQA = 0b10111000,
+  JEQR = 0b10111001,
+  JNEA = 0b10110100,
+  JNER = 0b10110101,
   SHLI = 0b11110000,
   SHLR = 0b11110001,
   SHRI = 0b11111000,
@@ -45,6 +49,15 @@ enum class Opcode : uint8_t {
   PEEKA = 0b10010001,
   POKER = 0b10011000,
   POKEA = 0b10011001,
+  CLRCRY = 0b11000000,
+  CLRCMP = 0b11000001,
+  CRYEQ = 0b11001000,
+  EQI = 0b11010000,
+  EQR = 0b11010001,
+  GTI = 0b11011000,
+  GTR = 0b11011001,
+  LTI = 0b11010100,
+  LTR = 0b11010101,
 };
 
 /**
@@ -67,10 +80,15 @@ enum class PseudoOpcode : int {
   RIO,
   WIO,
   JMP,
+  JEQ,
+  JNE,
   SHL,
   SHR,
   POKE,
   PEEK,
+  EQ,
+  GT,
+  LT,
 };
 
 #endif // SHARED_H
