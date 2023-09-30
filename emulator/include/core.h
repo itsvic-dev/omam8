@@ -6,8 +6,8 @@
 
 #include <rom.h>
 
-namespace omam8 {
-namespace Core {
+namespace omam8::Core {
+
 typedef struct EmuOpcode {
   std::string displayName;
   unsigned int argsLength;
@@ -16,12 +16,14 @@ typedef struct EmuOpcode {
 } EmuOpcode;
 
 enum Register : unsigned int {
-  PC = 0b010000,
-  SP = 0b100000,
-  A = 0b000001,
-  B = 0b000010,
-  C = 0b000100,
-  D = 0b001000,
+  PC = 0b00010000,
+  SP = 0b00100000,
+  A = 0b00000001,
+  B = 0b00000010,
+  C = 0b00000100,
+  D = 0b00001000,
+  CMP = 0b01000000,
+  CRY = 0b10000000,
 };
 
 enum IOMode : uint8_t {
@@ -49,7 +51,7 @@ void start_loop();
 void load_rom(omam8::ROM::ROMData rom);
 
 void halt_cpu();
-}; // namespace Core
-}; // namespace omam8
+
+}; // namespace omam8::Core
 
 #endif // CORE_H
