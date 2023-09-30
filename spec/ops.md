@@ -65,6 +65,12 @@ Unless specified otherwise, the opcode format is almost always:
 - `jmp` (`0b1011000X`) - jump to **dst**
   - `jmpa` (`0b10110000`) - **dst** is an address
   - `jmpr` (`0b10110001`) - **dst** is a combined register
+- `jeq` (`0b1011100X`) - jump to **dst** if the compare bit is set
+  - `jeqa` (`0b10111000`) - **dst** is an address
+  - `jeqr` (`0b10111001`) - **dst** is a combined register
+- `jne` (`0b1011010X`) - jump to **dst** if the compare bit is not set
+  - `jnea` (`0b10110100`) - **dst** is an address
+  - `jner` (`0b10110101`) - **dst** is a combined register
 - `shl` (`0b1111000X`) - shift register **dst** to the left by **src**
   - `shli` (`0b11110000`) - **src** is an _immediate_
   - `shlr` (`0b11110001`) - **src** is a register
@@ -77,3 +83,15 @@ Unless specified otherwise, the opcode format is almost always:
 - `poke` (`0b1001100X`) - write register **src** into address **dst**
   - `poker` (`0b10011000`) - **dst** is a combined register
   - `pokea` (`0b10011001`) - **dst** is an address
+- `clrcry` (`0b11000000`) - clears the carry bit
+- `clrcmp` (`0b11000001`) - clears the compare bit
+- `cryeq` (`0b11001000`) - sets the compare bit if the carry bit is set
+- `eq` (`0b1101000X`) - sets the compare bit if register **dst** is equal to **src**
+  - `eqi` (`0b11010000`) - **src** is an immediate
+  - `eqr` (`0b11010001`) - **src** is a register
+- `gt` (`0b1101100X`) - sets the compare bit if register **dst** is greater than **src**
+  - `gti` (`0b11011000`) - **src** is an immediate
+  - `gtr` (`0b11011001`) - **src** is a register
+- `lt` (`0b1101010X`) - sets the compare bit if register **dst** is less than **src**
+  - `lti` (`0b11010100`) - **src** is an immediate
+  - `ltr` (`0b11010101`) - **src** is a register

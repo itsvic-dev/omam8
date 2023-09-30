@@ -18,14 +18,16 @@
 
 ## Registers
 
-| Register        | Initial value | Argument representation | Bits |
-| --------------- | ------------- | ----------------------- | ---- |
-| Program counter | `0x8000`      | `0b010000`              | 16   |
-| Stack pointer   | `0x00FF`      | `0b100000`              | 16   |
-| `A`             | `0x00`        | `0b000001`              | 8    |
-| `B`             | `0x00`        | `0b000010`              | 8    |
-| `C`             | `0x00`        | `0b000100`              | 8    |
-| `D`             | `0x00`        | `0b001000`              | 8    |
+| Register            | Initial value | Argument representation | Bits |
+| ------------------- | ------------- | ----------------------- | ---- |
+| Program counter     | `0x8000`      | `0b00010000`            | 16   |
+| Stack pointer       | `0x00FF`      | `0b00100000`            | 16   |
+| `A`                 | `0x00`        | `0b00000001`            | 8    |
+| `B`                 | `0x00`        | `0b00000010`            | 8    |
+| `C`                 | `0x00`        | `0b00000100`            | 8    |
+| `D`                 | `0x00`        | `0b00001000`            | 8    |
+| `CMP` (compare bit) | `0b0`         | N/A                     | 1    |
+| `CRY` (carry bit)   | `0b0`         | N/A                     | 1    |
 
 ### Combined registers
 
