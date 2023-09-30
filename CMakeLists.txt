@@ -2,10 +2,10 @@ cmake_minimum_required(VERSION 3.12)
 
 project(omam8)
 
-option(YY_DEBUG "debug stuff" OFF)
+option(DEBUG "debug stuff" OFF)
 
-if (YY_DEBUG)
-    add_definitions(-DYY_DEBUG)
+if (DEBUG)
+    add_definitions(-DDEBUG -DYY_DEBUG)
 endif()
 
 include_directories(shared)

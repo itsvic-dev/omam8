@@ -227,19 +227,27 @@ void omam8::Core::handle_opcode() {
   if (!opcodes.contains(static_cast<Opcode>(memory[pc])))
     throw std::invalid_argument("opcode doesn't exist");
   EmuOpcode opcode = opcodes[static_cast<Opcode>(memory[pc])];
+#ifdef DEBUG
   std::cout << opcode.displayName << "\n";
+#endif
   opcode.handler(memory + pc + 1u);
   if (!opcode.manipulatesPC)
     registers_16b[Register::PC] = pc + 1u + opcode.argsLength;
 }
 
+#ifdef DEBUG
 void print_state();
+#endif
 
 void omam8::Core::start_loop() {
+#ifdef DEBUG
   print_state();
+#endif
   while (cpu_running) {
     handle_opcode();
+#ifdef DEBUG
     print_state();
+#endif
   }
 }
 
@@ -250,6 +258,7 @@ void omam8::Core::load_rom(omam8::ROM::ROMData rom) {
 
 void omam8::Core::halt_cpu() { cpu_running = false; }
 
+#ifdef DEBUG
 template <typename T> std::string int_to_hex(T i, int size) {
   std::stringstream stream;
   stream << "0x" << std::setfill('0') << std::setw(size) << std::hex
@@ -279,3 +288,4 @@ void print_state() {
   }
   std::cout << "\n";
 }
+#endif
