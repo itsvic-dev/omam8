@@ -22,8 +22,6 @@ enum Register : unsigned int {
   B = 0b00000010,
   C = 0b00000100,
   D = 0b00001000,
-  CMP = 0b01000000,
-  CRY = 0b10000000,
 };
 
 enum IOMode : uint8_t {
@@ -32,10 +30,17 @@ enum IOMode : uint8_t {
   WRITE = 0b10,
 };
 
+enum FlagRegister {
+  CMP,
+  CRY,
+};
+
 uint8_t get_register(Register reg);
 void set_register(Register reg, uint8_t value);
 uint16_t get_combined_register(unsigned int reg);
 void set_combined_register(unsigned int reg, uint16_t value);
+bool get_flag(FlagRegister reg);
+void set_flag(FlagRegister reg, bool value);
 
 uint8_t get_mram(uint16_t addr);
 void set_mram(uint16_t addr, uint8_t value);

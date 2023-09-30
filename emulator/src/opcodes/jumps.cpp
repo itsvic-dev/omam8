@@ -13,3 +13,27 @@ void omam8::Opcodes::jmpr(uint8_t *args) {
   uint16_t addr = omam8::Core::get_combined_register(args[0]);
   omam8::Core::set_combined_register(omam8::Core::PC, addr);
 }
+
+void omam8::Opcodes::jeqa(uint8_t *args) {
+  if (!Core::get_flag(Core::CMP))
+    return;
+  jmpa(args);
+}
+
+void omam8::Opcodes::jeqr(uint8_t *args) {
+  if (!Core::get_flag(Core::CMP))
+    return;
+  jmpr(args);
+}
+
+void omam8::Opcodes::jnea(uint8_t *args) {
+  if (Core::get_flag(Core::CMP))
+    return;
+  jmpa(args);
+}
+
+void omam8::Opcodes::jner(uint8_t *args) {
+  if (Core::get_flag(Core::CMP))
+    return;
+  jmpr(args);
+}

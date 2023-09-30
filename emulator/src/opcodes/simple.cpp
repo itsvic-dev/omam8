@@ -66,3 +66,73 @@ void omam8::Opcodes::pokea(uint8_t *args) {
   uint16_t addr = join_uint8_to_16(args[1], args[2]);
   omam8::Core::set_mram(addr, value);
 }
+
+void omam8::Opcodes::clrcry(uint8_t *args) {
+  Core::set_flag(Core::FlagRegister::CRY, false);
+}
+
+void omam8::Opcodes::clrcmp(uint8_t *args) {
+  Core::set_flag(Core::FlagRegister::CMP, false);
+}
+
+void omam8::Opcodes::cryeq(uint8_t *args) {
+  Core::set_flag(Core::FlagRegister::CMP,
+                 Core::get_flag(Core::FlagRegister::CRY));
+}
+
+void omam8::Opcodes::eqi(uint8_t *args) {
+  // eqi: 0 - immediate, 1 - register
+  Core::Register reg = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = args[0];
+  uint8_t b = Core::get_register(reg);
+  Core::set_flag(Core::FlagRegister::CMP, b == a);
+}
+
+void omam8::Opcodes::eqr(uint8_t *args) {
+  // eqr: 0 - register, 1 - register
+  Core::Register reg1 = static_cast<Core::Register>(args[0]);
+  Core::Register reg2 = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = Core::get_register(reg1);
+  uint8_t b = Core::get_register(reg2);
+  Core::set_flag(Core::FlagRegister::CMP, b == a);
+}
+
+void omam8::Opcodes::gti(uint8_t *args) {
+  // gti: 0 - immediate, 1 - register
+  Core::Register reg = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = args[0];
+  uint8_t b = Core::get_register(reg);
+  Core::set_flag(Core::FlagRegister::CMP, b > a);
+}
+
+void omam8::Opcodes::gtr(uint8_t *args) {
+  // gtr: 0 - register, 1 - register
+  Core::Register reg1 = static_cast<Core::Register>(args[0]);
+  Core::Register reg2 = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = Core::get_register(reg1);
+  uint8_t b = Core::get_register(reg2);
+  Core::set_flag(Core::FlagRegister::CMP, b > a);
+}
+
+void omam8::Opcodes::lti(uint8_t *args) {
+  // lti: 0 - immediate, 1 - register
+  Core::Register reg = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = args[0];
+  uint8_t b = Core::get_register(reg);
+  Core::set_flag(Core::FlagRegister::CMP, b < a);
+}
+
+void omam8::Opcodes::ltr(uint8_t *args) {
+  // ltr: 0 - register, 1 - register
+  Core::Register reg1 = static_cast<Core::Register>(args[0]);
+  Core::Register reg2 = static_cast<Core::Register>(args[1]);
+
+  uint8_t a = Core::get_register(reg1);
+  uint8_t b = Core::get_register(reg2);
+  Core::set_flag(Core::FlagRegister::CMP, b < a);
+}

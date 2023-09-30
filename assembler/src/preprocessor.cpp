@@ -72,33 +72,33 @@ pseudo_predicate_t wio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::WIORI};
 pseudo_predicate_t empty_predicate = {0, Preprocessor::ArgType::ADDRESS,
                                       Opcode::NOP};
 
-#define PSEUDO_IR(pseudo, opi, opr)                                            \
+#define PSEUDO_IR(pseudo)                                                      \
   {                                                                            \
     PseudoOpcode::pseudo, {                                                    \
-      {0, Preprocessor::ArgType::NUMBER, Opcode::opi},                         \
-          {0, Preprocessor::ArgType::REGISTER, Opcode::opr},                   \
+      {0, Preprocessor::ArgType::NUMBER, Opcode::pseudo##I},                   \
+          {0, Preprocessor::ArgType::REGISTER, Opcode::pseudo##R},             \
     }                                                                          \
   }
 
-#define PSEUDO_AR(pseudo, opa, opr)                                            \
+#define PSEUDO_AR(pseudo)                                                      \
   {                                                                            \
     PseudoOpcode::pseudo, {                                                    \
-      {0, Preprocessor::ArgType::ADDRESS, Opcode::opa},                        \
-          {0, Preprocessor::ArgType::REGISTER, Opcode::opr},                   \
+      {0, Preprocessor::ArgType::ADDRESS, Opcode::pseudo##A},                  \
+          {0, Preprocessor::ArgType::REGISTER, Opcode::pseudo##R},             \
     }                                                                          \
   }
 
 std::map<std::string, pseudo_t> pseudoOpcodes = {
-    {"mov", PSEUDO_IR(MOV, MOVI, MOVR)},
-    {"mov16", PSEUDO_AR(MOV16, MOV16A, MOV16R)},
-    {"add", PSEUDO_IR(ADD, ADDI, ADDR)},
-    {"sub", PSEUDO_IR(SUB, SUBI, SUBR)},
-    {"and", PSEUDO_IR(AND, ANDI, ANDR)},
-    {"or", PSEUDO_IR(OR, ORI, ORR)},
-    {"xor", PSEUDO_IR(XOR, XORI, XORR)},
-    {"push", PSEUDO_IR(PUSH, PUSHI, PUSHR)},
-    {"pop", PSEUDO_AR(POP, POPA, POPR)},
-    {"sio", PSEUDO_IR(SIO, SIOI, SIOR)},
+    {"mov", PSEUDO_IR(MOV)},
+    {"mov16", PSEUDO_AR(MOV16)},
+    {"add", PSEUDO_IR(ADD)},
+    {"sub", PSEUDO_IR(SUB)},
+    {"and", PSEUDO_IR(AND)},
+    {"or", PSEUDO_IR(OR)},
+    {"xor", PSEUDO_IR(XOR)},
+    {"push", PSEUDO_IR(PUSH)},
+    {"pop", PSEUDO_AR(POP)},
+    {"sio", PSEUDO_IR(SIO)},
     {"rio",
      {PseudoOpcode::RIO,
       {rio_i,
@@ -117,16 +117,16 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
        {1, Preprocessor::ArgType::REGISTER, Opcode::WIOAR, &wio_a},
        {1, Preprocessor::ArgType::REGISTER, Opcode::WIORR, &wio_r}},
       2}},
-    {"jmp", PSEUDO_AR(JMP, JMPA, JMPR)},
-    {"jeq", PSEUDO_AR(JEQ, JEQA, JEQR)},
-    {"jne", PSEUDO_AR(JNE, JNEA, JNER)},
-    {"shl", PSEUDO_IR(SHL, SHLI, SHLR)},
-    {"shr", PSEUDO_IR(SHR, SHRI, SHRR)},
-    {"peek", PSEUDO_AR(PEEK, PEEKA, PEEKR)},
-    {"poke", PSEUDO_AR(POKE, POKEA, POKER)},
-    {"eq", PSEUDO_IR(EQ, EQI, EQR)},
-    {"gt", PSEUDO_IR(GT, GTI, GTR)},
-    {"lt", PSEUDO_IR(LT, LTI, LTR)},
+    {"jmp", PSEUDO_AR(JMP)},
+    {"jeq", PSEUDO_AR(JEQ)},
+    {"jne", PSEUDO_AR(JNE)},
+    {"shl", PSEUDO_IR(SHL)},
+    {"shr", PSEUDO_IR(SHR)},
+    {"peek", PSEUDO_AR(PEEK)},
+    {"poke", PSEUDO_AR(POKE)},
+    {"eq", PSEUDO_IR(EQ)},
+    {"gt", PSEUDO_IR(GT)},
+    {"lt", PSEUDO_IR(LT)},
 };
 
 std::map<std::string, uint8_t> registers = {

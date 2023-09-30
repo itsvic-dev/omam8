@@ -22,11 +22,21 @@ using namespace omam8::Core;
 // ##         INTERNAL CORE VARS         ##
 // ########################################
 
+#define DEF_OPCODE(opcode, function, argsLength)                               \
+  {                                                                            \
+    Opcode::opcode, { #function, argsLength, omam8::Opcodes::function }        \
+  }
+
+#define DEF_OPCODE_PC(opcode, function, argsLength)                            \
+  {                                                                            \
+    Opcode::opcode, { #function, argsLength, omam8::Opcodes::function, true }  \
+  }
+
 std::map<Opcode, EmuOpcode> opcodes{
-    {Opcode::NOP, {"nop", 0, omam8::Opcodes::nop}},
-    {Opcode::HLT, {"hlt", 0, omam8::Opcodes::hlt}},
-    {Opcode::MOVI, {"movi", 2, omam8::Opcodes::movi}},
-    {Opcode::MOVR, {"movr", 2, omam8::Opcodes::movr}},
+    DEF_OPCODE(NOP, nop, 0),
+    DEF_OPCODE(HLT, hlt, 0),
+    DEF_OPCODE(MOVI, movi, 2),
+    DEF_OPCODE(MOVR, movr, 2),
     {Opcode::MOV16A, {"mov16a", 3, omam8::Opcodes::mov16a}},
     {Opcode::MOV16R, {"mov16r", 3, omam8::Opcodes::mov16r}},
     {Opcode::ADDI, {"addi", 2, omam8::Opcodes::addi}},
@@ -54,8 +64,12 @@ std::map<Opcode, EmuOpcode> opcodes{
     {Opcode::WIOAR, {"wioar", 3, omam8::Opcodes::wioar}},
     {Opcode::WIORI, {"wiori", 2, omam8::Opcodes::wiori}},
     {Opcode::WIORR, {"wiorr", 2, omam8::Opcodes::wiorr}},
-    {Opcode::JMPA, {"jmpa", 2, omam8::Opcodes::jmpa, true}},
-    {Opcode::JMPR, {"jmpr", 1, omam8::Opcodes::jmpr, true}},
+    DEF_OPCODE_PC(JMPA, jmpa, 2),
+    DEF_OPCODE_PC(JMPR, jmpr, 1),
+    DEF_OPCODE_PC(JEQA, jeqa, 2),
+    DEF_OPCODE_PC(JEQR, jeqr, 1),
+    DEF_OPCODE_PC(JNEA, jnea, 2),
+    DEF_OPCODE_PC(JNER, jner, 1),
     {Opcode::SHLI, {"shli", 2, omam8::Opcodes::shli}},
     {Opcode::SHLR, {"shlr", 2, omam8::Opcodes::shlr}},
     {Opcode::SHRI, {"shri", 2, omam8::Opcodes::shri}},
@@ -64,6 +78,15 @@ std::map<Opcode, EmuOpcode> opcodes{
     {Opcode::PEEKA, {"peeka", 3, omam8::Opcodes::peeka}},
     {Opcode::POKER, {"poker", 2, omam8::Opcodes::poker}},
     {Opcode::POKEA, {"pokea", 3, omam8::Opcodes::pokea}},
+    DEF_OPCODE(CLRCRY, clrcry, 0),
+    DEF_OPCODE(CLRCMP, clrcmp, 0),
+    DEF_OPCODE(CRYEQ, cryeq, 0),
+    DEF_OPCODE(EQI, eqi, 2),
+    DEF_OPCODE(EQR, eqr, 2),
+    DEF_OPCODE(GTI, gti, 2),
+    DEF_OPCODE(GTR, gtr, 2),
+    DEF_OPCODE(LTI, lti, 2),
+    DEF_OPCODE(LTR, ltr, 2),
 };
 
 std::map<Register, uint16_t> registers_16b{
@@ -76,6 +99,11 @@ std::map<Register, uint8_t> registers_8b{
     {Register::B, 0x0},
     {Register::C, 0x0},
     {Register::D, 0x0},
+};
+
+std::map<FlagRegister, bool> registers_flags{
+    {FlagRegister::CMP, false},
+    {FlagRegister::CRY, false},
 };
 
 uint8_t *memory;
@@ -133,6 +161,12 @@ void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
   }
 
   throw std::logic_error("invalid combined register");
+}
+
+bool omam8::Core::get_flag(FlagRegister reg) { return registers_flags[reg]; }
+
+void omam8::Core::set_flag(FlagRegister reg, bool value) {
+  registers_flags[reg] = value;
 }
 
 uint8_t omam8::Core::get_mram(uint16_t addr) { return memory[addr]; }
@@ -229,7 +263,9 @@ void print_state() {
   std::cout << "A: " << int_to_hex(get_register(A), 2) << "      ";
   std::cout << "C: " << int_to_hex(get_register(C), 2) << "\n";
   std::cout << "B: " << int_to_hex(get_register(B), 2) << "      ";
-  std::cout << "D: " << int_to_hex(get_register(D), 2) << "\n";
+  std::cout << "D: " << int_to_hex(get_register(D), 2) << "      ";
+  std::cout << "Flags: " << (get_flag(CMP) ? 1 : 0) << (get_flag(CRY) ? 1 : 0)
+            << "\n";
   std::cout << "IO: ";
   for (int i = 0; i < 32; i++) {
     std::cout << (io_pins[i] ? "1" : "0");

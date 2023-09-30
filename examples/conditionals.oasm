@@ -1,0 +1,17 @@
+
+    mov 8, %a  ; load 8 into A
+    mov 4, %b  ; load 4 into B
+
+    gt %b, %a  ; if a > b
+    jeq .success
+
+    ; not bigger
+    jmp .end
+
+success:
+    mov 1, %a
+    jmp .end
+
+end:
+    clrcmp ; clear the compare bit
+    hlt

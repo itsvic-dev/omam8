@@ -2,11 +2,9 @@ cmake_minimum_required(VERSION 3.12)
 
 project(omam8)
 
-if (${YY_DEBUG} MATCHES "no")
-    unset(YY_DEBUG)
-endif()
+option(YY_DEBUG "debug stuff" OFF)
 
-if (DEFINED YY_DEBUG)
+if (YY_DEBUG)
     add_definitions(-DYY_DEBUG)
 endif()
 
