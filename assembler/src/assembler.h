@@ -1,18 +1,17 @@
-#ifndef PREPROCESSOR_H
-#define PREPROCESSOR_H
+#ifndef ASSEMBLER_H
+#define ASSEMBLER_H
 
 #include "shared.h"
 #include <map>
 #include <string>
 #include <vector>
 
-class Preprocessor {
+class Assembler {
 public:
-  explicit Preprocessor();
+  explicit Assembler();
   enum class ArgType {
     LABEL,
     REGISTER,
-    // IMMEDIATE, // might be used later idk
     ADDRESS,
     NUMBER,
   };
@@ -41,6 +40,9 @@ public:
   void handle_number(char *text);
   void handle_instruction();
 
+  void handle_directive_data(char *text);
+  void handle_directive_asciiz(char *text);
+
   void build_intermediate_rom();
   void save_rom(std::string path);
 
@@ -61,6 +63,9 @@ void handle_address(char *text);
 void handle_number(char *text);
 void handle_instruction();
 
-Preprocessor &get_preprocessor();
+void handle_directive_data(char *text);
+void handle_directive_asciiz(char *text);
 
-#endif // PREPROCESSOR_H
+Assembler &get_assembler();
+
+#endif // ASSEMBLER_H

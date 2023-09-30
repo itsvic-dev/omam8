@@ -1,4 +1,4 @@
-#include "preprocessor.h"
+#include "assembler.h"
 #include "helpers.h"
 #include "rom.h"
 #include "shared.h"
@@ -9,12 +9,12 @@
 #include <list>
 #include <sstream>
 #include <stdexcept>
+#include <string>
 
-Preprocessor::Preprocessor() {}
+Assembler::Assembler() {}
+Assembler assembler;
 
-Preprocessor preprocessor;
-
-void Preprocessor::handle_new_label(char *text) {
+void Assembler::handle_new_label(char *text) {
   std::cout << "[PRE] new label: " << text << "\n";
   this->current_label = std::string(text);
 }
@@ -52,7 +52,7 @@ std::map<std::string, Opcode> opcodes = {
 
 typedef struct pseudo_predicate {
   int arg_pos;
-  Preprocessor::ArgType arg_type;
+  Assembler::ArgType arg_type;
   Opcode opcode;
   struct pseudo_predicate *requirement = nullptr;
 } pseudo_predicate_t;
@@ -64,27 +64,27 @@ typedef struct pseudo {
 } pseudo_t;
 
 // RIO/WIO is more complicated than other pseudo-opcodes
-pseudo_predicate_t rio_i = {0, Preprocessor::ArgType::NUMBER, Opcode::RIOIA};
-pseudo_predicate_t rio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::RIORA};
-pseudo_predicate_t wio_a = {0, Preprocessor::ArgType::ADDRESS, Opcode::WIOAI};
-pseudo_predicate_t wio_r = {0, Preprocessor::ArgType::REGISTER, Opcode::WIORI};
+pseudo_predicate_t rio_i = {0, Assembler::ArgType::NUMBER, Opcode::RIOIA};
+pseudo_predicate_t rio_r = {0, Assembler::ArgType::REGISTER, Opcode::RIORA};
+pseudo_predicate_t wio_a = {0, Assembler::ArgType::ADDRESS, Opcode::WIOAI};
+pseudo_predicate_t wio_r = {0, Assembler::ArgType::REGISTER, Opcode::WIORI};
 
-pseudo_predicate_t empty_predicate = {0, Preprocessor::ArgType::ADDRESS,
+pseudo_predicate_t empty_predicate = {0, Assembler::ArgType::ADDRESS,
                                       Opcode::NOP};
 
 #define PSEUDO_IR(pseudo)                                                      \
   {                                                                            \
     PseudoOpcode::pseudo, {                                                    \
-      {0, Preprocessor::ArgType::NUMBER, Opcode::pseudo##I},                   \
-          {0, Preprocessor::ArgType::REGISTER, Opcode::pseudo##R},             \
+      {0, Assembler::ArgType::NUMBER, Opcode::pseudo##I},                      \
+          {0, Assembler::ArgType::REGISTER, Opcode::pseudo##R},                \
     }                                                                          \
   }
 
 #define PSEUDO_AR(pseudo)                                                      \
   {                                                                            \
     PseudoOpcode::pseudo, {                                                    \
-      {0, Preprocessor::ArgType::ADDRESS, Opcode::pseudo##A},                  \
-          {0, Preprocessor::ArgType::REGISTER, Opcode::pseudo##R},             \
+      {0, Assembler::ArgType::ADDRESS, Opcode::pseudo##A},                     \
+          {0, Assembler::ArgType::REGISTER, Opcode::pseudo##R},                \
     }                                                                          \
   }
 
@@ -103,19 +103,19 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
      {PseudoOpcode::RIO,
       {rio_i,
        rio_r,
-       {1, Preprocessor::ArgType::ADDRESS, Opcode::RIOIA, &rio_i},
-       {1, Preprocessor::ArgType::ADDRESS, Opcode::RIORA, &rio_r},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::RIOIR, &rio_i},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::RIORR, &rio_r}},
+       {1, Assembler::ArgType::ADDRESS, Opcode::RIOIA, &rio_i},
+       {1, Assembler::ArgType::ADDRESS, Opcode::RIORA, &rio_r},
+       {1, Assembler::ArgType::REGISTER, Opcode::RIOIR, &rio_i},
+       {1, Assembler::ArgType::REGISTER, Opcode::RIORR, &rio_r}},
       2}},
     {"wio",
      {PseudoOpcode::WIO,
       {wio_a,
        wio_r,
-       {1, Preprocessor::ArgType::NUMBER, Opcode::WIOAI, &wio_a},
-       {1, Preprocessor::ArgType::NUMBER, Opcode::WIORI, &wio_r},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::WIOAR, &wio_a},
-       {1, Preprocessor::ArgType::REGISTER, Opcode::WIORR, &wio_r}},
+       {1, Assembler::ArgType::NUMBER, Opcode::WIOAI, &wio_a},
+       {1, Assembler::ArgType::NUMBER, Opcode::WIORI, &wio_r},
+       {1, Assembler::ArgType::REGISTER, Opcode::WIOAR, &wio_a},
+       {1, Assembler::ArgType::REGISTER, Opcode::WIORR, &wio_r}},
       2}},
     {"jmp", PSEUDO_AR(JMP)},
     {"jeq", PSEUDO_AR(JEQ)},
@@ -137,7 +137,7 @@ std::map<std::string, uint8_t> registers = {
 /**
  * Handles the start of a new instruction.
  */
-void Preprocessor::handle_opcode(char *text) {
+void Assembler::handle_opcode(char *text) {
   std::cout << "[PRE] new opcode: " << text << "\n";
   std::string opcode = std::string(text);
 
@@ -154,36 +154,36 @@ void Preprocessor::handle_opcode(char *text) {
 }
 
 /**
- * Handles a LABEL preprocessor argument.
+ * Handles a LABEL Assembler argument.
  */
-void Preprocessor::handle_label_mention(char *text) {
+void Assembler::handle_label_mention(char *text) {
   std::cout << "[PRE] label arg: " << text << "\n";
   this->current_instruction->arguments.push_back(
       new arg_t{ArgType::LABEL, std::string(text)});
 }
 
 /**
- * Handles a REGISTER preprocessor argument.
+ * Handles a REGISTER Assembler argument.
  */
-void Preprocessor::handle_register(char *text) {
+void Assembler::handle_register(char *text) {
   std::cout << "[PRE] register arg: " << text << "\n";
   this->current_instruction->arguments.push_back(
       new arg_t{ArgType::REGISTER, std::string(text)});
 }
 
 /**
- * Handles an ADDRESS preprocessor argument.
+ * Handles an ADDRESS Assembler argument.
  */
-void Preprocessor::handle_address(char *text) {
+void Assembler::handle_address(char *text) {
   std::cout << "[PRE] address arg: " << text << "\n";
   this->current_instruction->arguments.push_back(
       new arg_t{ArgType::ADDRESS, std::string(text)});
 }
 
 /**
- * Handles a NUMBER preprocessor argument.
+ * Handles a NUMBER Assembler argument.
  */
-void Preprocessor::handle_number(char *text) {
+void Assembler::handle_number(char *text) {
   std::cout << "[PRE] number arg: " << text << "\n";
   this->current_instruction->arguments.push_back(
       new arg_t{ArgType::NUMBER, std::string(text)});
@@ -192,7 +192,7 @@ void Preprocessor::handle_number(char *text) {
 /**
  * Handles the end of an instruction, pushing it to the labels map.
  */
-void Preprocessor::handle_instruction() {
+void Assembler::handle_instruction() {
   std::cout << "[PRE] insn end\n";
 
   if (!labels.contains(current_label))
@@ -201,7 +201,39 @@ void Preprocessor::handle_instruction() {
   labels[current_label].push_back(this->current_instruction);
 }
 
-void Preprocessor::build_intermediate_rom() {
+void Assembler::handle_directive_data(char *text) {
+  uint8_t i = std::stoi(std::string(text), nullptr, 0);
+  std::cout << "[PRE] #data " << i << "\n";
+
+  // inject an 'instruction' with our desired value into the current label
+  if (!labels.contains(current_label))
+    labels[current_label] = std::vector<inst_t *>();
+
+  inst_t *fake_inst = new inst_t{(Opcode)i, PseudoOpcode::NONE, {}};
+
+  labels[current_label].push_back(fake_inst);
+}
+
+void Assembler::handle_directive_asciiz(char *text) {
+  std::cout << "[PRE] #asciiz " << text << "\n";
+
+  // inject an 'instruction' with our desired values into the current label
+  if (!labels.contains(current_label))
+    labels[current_label] = std::vector<inst_t *>();
+
+  uint8_t i = *text;
+  inst_t *fake_inst = new inst_t{(Opcode)i, PseudoOpcode::NONE, {}};
+
+  while ((i = *++text) != 0) {
+    fake_inst->arguments.push_back(
+        new arg_t{ArgType::NUMBER, std::to_string(i)});
+  }
+  fake_inst->arguments.push_back(new arg_t{ArgType::NUMBER, "0"});
+
+  labels[current_label].push_back(fake_inst);
+}
+
+void Assembler::build_intermediate_rom() {
   std::cout << "[PRE] intermediate ROM start\n";
   for (const auto &[label, inst_list] : labels) {
     std::cout << label << " has " << inst_list.size() << " instructions\n";
@@ -352,21 +384,26 @@ void Preprocessor::build_intermediate_rom() {
   }
 }
 
-void Preprocessor::save_rom(std::string path) {
+void Assembler::save_rom(std::string path) {
   build_and_write_rom(path, stage3_rom);
 }
 
 // Helper functions
-void handle_new_label(char *text) { preprocessor.handle_new_label(text); }
+void handle_new_label(char *text) { assembler.handle_new_label(text); }
 
-void handle_opcode(char *text) { preprocessor.handle_opcode(text); }
+void handle_opcode(char *text) { assembler.handle_opcode(text); }
 
-void handle_label_mention(char *text) {
-  preprocessor.handle_label_mention(text);
+void handle_label_mention(char *text) { assembler.handle_label_mention(text); }
+void handle_register(char *text) { assembler.handle_register(text); }
+void handle_address(char *text) { assembler.handle_address(text); }
+void handle_number(char *text) { assembler.handle_number(text); }
+void handle_instruction() { assembler.handle_instruction(); }
+
+void handle_directive_data(char *text) {
+  assembler.handle_directive_data(text);
 }
-void handle_register(char *text) { preprocessor.handle_register(text); }
-void handle_address(char *text) { preprocessor.handle_address(text); }
-void handle_number(char *text) { preprocessor.handle_number(text); }
-void handle_instruction() { preprocessor.handle_instruction(); }
+void handle_directive_asciiz(char *text) {
+  assembler.handle_directive_asciiz(text);
+}
 
-Preprocessor &get_preprocessor() { return preprocessor; }
+Assembler &get_assembler() { return assembler; }

@@ -1,6 +1,5 @@
-#include "preprocessor.h"
-// preprocessor MUST BE before parser.c, as it depends on some preprocessor
-// functions
+#include "assembler.h"
+// parser.c depends on assembler, preprocessor etc etc
 #include "parser.c"
 #include <cstdio>
 #include <exception>
@@ -11,15 +10,18 @@ int main(int argc, char **argv) {
     std::cout << "No output file specified.\n";
     return 1;
   }
+  Assembler &assembler = get_assembler();
+
+  // parse stdin
   while (yyparse())
     ;
-  Preprocessor &preprocessor = get_preprocessor();
+
   try {
-    preprocessor.build_intermediate_rom();
+    assembler.build_intermediate_rom();
   } catch (std::logic_error exc) {
-    std::cerr << "oopsies an erro rhappened " << exc.what() << "\n";
+    std::cerr << "Error: " << exc.what() << "\n";
     return 1;
   }
-  preprocessor.save_rom(argv[1]);
+  assembler.save_rom(argv[1]);
   return 0;
 }

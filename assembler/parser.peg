@@ -1,10 +1,9 @@
 Program <- (NL* Line NL*)+ EOF
-Line <- (SPACE* Comment) / ((LabelStart (SPACE Instruction)? / Instruction) (SPACE* Comment)?)
+Line <- (WHITESPACE* Comment) / WHITESPACE* ((LabelStart (WHITESPACE* (Instruction / AssemblerDirective))? / Instruction) / AssemblerDirective) (WHITESPACE* Comment)?
 
 Comment <- ';' (!NL .)* NL
 
-Instruction <- (TAB / SPACE)? ((Opcode SPACE (Argument SEP?)+) / Opcode) { handle_instruction(); }
-
+Instruction <- (Opcode WHITESPACE+ (Argument SEP?)+) / Opcode { handle_instruction(); }
 Opcode <- < [a-z] [a-z0-9]+ > { handle_opcode(yytext); }
 
 Argument <- LabelMention / Address / Number / Register
@@ -17,10 +16,15 @@ NumberBase <- < (('0x' [0-9a-fA-F]+) / [0-9]+) >
 
 LabelStart <- LabelBase ':' { handle_new_label(yytext); }
 LabelMention <- '.' LabelBase { handle_label_mention(yytext); }
-LabelBase <- < [a-zA-Z_] [a-zA-Z0-9_]+ >
+LabelBase <- <[a-zA-Z_][a-zA-Z0-9_]*>
+
+AssemblerDirective <- '#' (DirectiveData / DirectiveAsciiz)
+DirectiveData <- 'data' WHITESPACE+ NumberBase { handle_directive_data(yytext); }
+DirectiveAsciiz <- 'asciiz' WHITESPACE+ '"' <(!'"' !NL .)*> '"' { handle_directive_asciiz(yytext); }
 
 TAB <- '\t'+
 SPACE <- ' '+
-SEP <- ',' SPACE?
+WHITESPACE <- TAB / SPACE
+SEP <- ',' WHITESPACE*
 NL <- '\r\n' / '\r' / '\n'
 EOF <- !.
