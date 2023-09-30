@@ -49,7 +49,7 @@ public:
 private:
   inst_t *current_instruction = nullptr;
   std::string current_label = "(default)";
-  std::map<std::string, std::vector<inst_t *>> labels;
+  std::map<std::string, std::vector<inst_t *>> labels = {{"(default)", {}}};
   std::map<std::string, std::vector<uint8_t>> stage2_rom;
   std::map<std::string, std::vector<label_pos_t *>> stage2_rom_label_positions;
   std::vector<uint8_t> stage3_rom;

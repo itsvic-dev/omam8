@@ -10,13 +10,19 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 Assembler::Assembler() {}
 Assembler assembler;
 
 void Assembler::handle_new_label(char *text) {
   std::cout << "[PRE] new label: " << text << "\n";
-  this->current_label = std::string(text);
+  std::string newLabel = text;
+  if (labels.contains(newLabel)) {
+    throw std::invalid_argument("label " + newLabel + " was redefined");
+  }
+  this->current_label = newLabel;
+  labels[newLabel] = std::vector<inst_t *>();
 }
 
 std::map<std::string, Opcode> opcodes = {
@@ -195,9 +201,6 @@ void Assembler::handle_number(char *text) {
 void Assembler::handle_instruction() {
   std::cout << "[PRE] insn end\n";
 
-  if (!labels.contains(current_label))
-    labels[current_label] = std::vector<inst_t *>();
-
   labels[current_label].push_back(this->current_instruction);
 }
 
@@ -206,9 +209,6 @@ void Assembler::handle_directive_data(char *text) {
   std::cout << "[PRE] #data " << i << "\n";
 
   // inject an 'instruction' with our desired value into the current label
-  if (!labels.contains(current_label))
-    labels[current_label] = std::vector<inst_t *>();
-
   inst_t *fake_inst = new inst_t{(Opcode)i, PseudoOpcode::NONE, {}};
 
   labels[current_label].push_back(fake_inst);
@@ -218,9 +218,6 @@ void Assembler::handle_directive_asciiz(char *text) {
   std::cout << "[PRE] #asciiz " << text << "\n";
 
   // inject an 'instruction' with our desired values into the current label
-  if (!labels.contains(current_label))
-    labels[current_label] = std::vector<inst_t *>();
-
   uint8_t i = *text;
   inst_t *fake_inst = new inst_t{(Opcode)i, PseudoOpcode::NONE, {}};
 

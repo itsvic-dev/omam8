@@ -698,9 +698,9 @@ YY_RULE(int) yy_Instruction(yycontext *yy)
   l63:;	  goto l58;
   l59:;	  yy->__pos= yypos59; yy->__thunkpos= yythunkpos59;
   }  goto l54;
-  l55:;	  yy->__pos= yypos54; yy->__thunkpos= yythunkpos54;  if (!yy_Opcode(yy)) goto l53;  yyDo(yy, yy_1_Instruction, yy->__begin, yy->__end);
+  l55:;	  yy->__pos= yypos54; yy->__thunkpos= yythunkpos54;  if (!yy_Opcode(yy)) goto l53;
   }
-  l54:;	
+  l54:;	  yyDo(yy, yy_1_Instruction, yy->__begin, yy->__end);
   yyprintf((stderr, "  ok   %s @ %s\n", "Instruction", yy->__buf+yy->__pos));
   return 1;
   l53:;	  yy->__pos= yypos0; yy->__thunkpos= yythunkpos0;

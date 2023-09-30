@@ -1,9 +1,9 @@
 Program <- (NL* Line NL*)+ EOF
-Line <- (WHITESPACE* Comment) / WHITESPACE* ((LabelStart (WHITESPACE* (Instruction / AssemblerDirective))? / Instruction) / AssemblerDirective) (WHITESPACE* Comment)?
+Line <- (WHITESPACE* Comment) / WHITESPACE* (LabelStart (WHITESPACE* (Instruction / AssemblerDirective))? / Instruction / AssemblerDirective) (WHITESPACE* Comment)?
 
 Comment <- ';' (!NL .)* NL
 
-Instruction <- (Opcode WHITESPACE+ (Argument SEP?)+) / Opcode { handle_instruction(); }
+Instruction <- ((Opcode WHITESPACE+ (Argument SEP?)+) / Opcode) { handle_instruction(); }
 Opcode <- < [a-z] [a-z0-9]+ > { handle_opcode(yytext); }
 
 Argument <- LabelMention / Address / Number / Register
