@@ -30,6 +30,16 @@ Unless specified otherwise, the opcode format is almost always:
 - `sub` (`0b0110000X`) - subtract **src** from register **dst**
   - `subi` (`0b01100000`) - **src** is an _immediate_
   - `subr` (`0b01100001`) - **src** is a register
+- `and` (`0b0101100X`) - ANDs **dst** with **src**
+  - `andi` (`0b01011000`) - **src** is an _immediate_
+  - `andr` (`0b01011001`) - **src** is a register
+- `or` (`0b0101010X`) - ORs **dst** with **src**
+  - `ori` (`0b01010100`) - **src** is an _immediate_
+  - `orr` (`0b01010101`) - **src** is a register
+- `xor` (`0b0101000X`) - XORs **dst** with **src**
+  - `xori` (`0b01010000`) - **src** is an _immediate_
+  - `xorr` (`0b01010001`) - **src** is a register
+- `not` (`0b01011100`) - inverts the contents of register **dst**
 - `push` (`0b1010000X`) - push **src** onto stack
   - `pushi` (`0b10100000`) - **src** is an _immediate_
   - `pushr` (`0b10100001`) - **src** is a register

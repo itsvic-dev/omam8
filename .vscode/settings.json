@@ -6,7 +6,9 @@
             "env": {
                 "CHERE_INVOKING": "1"
             },
-            "args": ["-l"]
+            "args": [
+                "-l"
+            ]
         }
     },
     "terminal.integrated.defaultProfile.windows": "Cygwin",
@@ -92,4 +94,5 @@
         "queue": "cpp",
         "stack": "cpp"
     },
+    "editor.formatOnSave": true,
 }
