@@ -129,7 +129,12 @@ std::map<std::string, pseudo_t> pseudoOpcodes = {
     {"shl", PSEUDO_IR(SHL)},
     {"shr", PSEUDO_IR(SHR)},
     {"peek", PSEUDO_AR(PEEK)},
-    {"poke", PSEUDO_AR(POKE)},
+    {"poke",
+     {PseudoOpcode::POKE,
+      {
+          {1, Assembler::ArgType::ADDRESS, Opcode::POKEA},
+          {1, Assembler::ArgType::REGISTER, Opcode::POKER},
+      }}},
     {"eq", PSEUDO_IR(EQ)},
     {"gt", PSEUDO_IR(GT)},
     {"lt", PSEUDO_IR(LT)},
