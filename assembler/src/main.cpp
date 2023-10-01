@@ -13,11 +13,11 @@ int main(int argc, char **argv) {
   }
   Assembler &assembler = get_assembler();
 
-  // parse stdin
-  while (yyparse())
-    ;
-
   try {
+    // parse stdin
+    while (yyparse())
+      ;
+
     assembler.build_intermediate_rom();
   } catch (std::logic_error exc) {
     std::cerr << "Error: " << exc.what() << "\n";
