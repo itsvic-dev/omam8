@@ -33,7 +33,7 @@
 
 Combined registers can be used to dynamically write to 16-bit addresses without copying and writing code at runtime.
 
-16-bit registers can be internally handled as combined registers, and opcodes writing to combined registers should also handle the 16-bit registers.
+16-bit registers can be internally handled as combined registers, and opcodes handling combined registers should also handle 16-bit registers, and vice versa.
 
 - `BA` - Registers `B` and `A`. Represented by `0b000011`.
 - `DC` - Registers `D` and `C`. Represented by `0b001100`.

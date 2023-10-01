@@ -130,11 +130,11 @@ uint16_t omam8::Core::get_combined_register(unsigned int reg) {
   }
 
   if (reg == (Register::B | Register::A)) {
-    return join_uint8_to_16(registers_8b[B], registers_8b[A]);
+    return join_uint8_to_16(registers_8b[A], registers_8b[B]);
   }
 
   if (reg == (Register::D | Register::C)) {
-    return join_uint8_to_16(registers_8b[D], registers_8b[C]);
+    return join_uint8_to_16(registers_8b[C], registers_8b[D]);
   }
 
   throw std::logic_error("invalid combined register");
@@ -149,14 +149,14 @@ void omam8::Core::set_combined_register(unsigned int reg, uint16_t value) {
   uint16_to_8_t value_8b = split_uint16_to_8(value);
 
   if (reg == (Register::B | Register::A)) {
-    registers_8b[B] = value_8b.lower;
-    registers_8b[A] = value_8b.upper;
+    registers_8b[B] = value_8b.upper;
+    registers_8b[A] = value_8b.lower;
     return;
   }
 
   if (reg == (Register::D | Register::C)) {
-    registers_8b[D] = value_8b.lower;
-    registers_8b[C] = value_8b.upper;
+    registers_8b[D] = value_8b.upper;
+    registers_8b[C] = value_8b.lower;
     return;
   }
 

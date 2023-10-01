@@ -1,0 +1,47 @@
+    jmp .main
+
+main:
+    ; load the return address into BA, push it onto the stack, then jump to callee
+    mov16 .main_ret, %ba
+    push %a
+    push %b
+
+    ; push %c onto the stack as well
+    push %c
+    jmp .do_smth
+
+main_ret:
+    ; if %c is 10, halt, otherwise jump back to main
+    pop %c
+    eq 10, %c
+    jne .main
+    hlt
+
+do_smth:
+    pop %a
+    add 1, %a
+
+    ; pop the return address to DC and jump back
+    pop %d
+    pop %c
+
+    ; return value
+    push %a
+    jmp %dc
+
+
+; equivalent C, more or less:
+; int do_smth(int a) {
+;     return a + 1;
+; }
+; 
+; while (c != 10)
+;   c = do_smth(c);
+
+; ofc a simpler way would be to
+; loop:
+;     add 1, %c
+;     eq 10, %c
+;     jne .loop
+;     hlt
+; but who cares? this is more fun :P
