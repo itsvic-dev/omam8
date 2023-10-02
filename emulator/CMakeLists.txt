@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
-
 project(omam8emu)
+
+find_package(boost_program_options REQUIRED)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
@@ -18,3 +19,4 @@ add_executable(${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
+target_link_libraries(${PROJECT_NAME} Boost::program_options)
