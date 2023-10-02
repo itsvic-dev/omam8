@@ -1,4 +1,5 @@
 #include "helpers.h"
+#include "io.h"
 #include <core.h>
 #include <cstdlib>
 #include <cstring>
@@ -203,6 +204,9 @@ void omam8::Core::write_io_pin(int io_pin, bool value) {
     throw std::logic_error("cannot write to non-existent pin");
   if (io_pin_modes[io_pin] != WRITE) {
     throw std::logic_error("cannot write to a pin that isn't in write mode");
+  }
+  if (io_pins[io_pin] != value) {
+    IOEmu::handlePinSet(io_pin, value);
   }
   io_pins[io_pin] = value;
 }

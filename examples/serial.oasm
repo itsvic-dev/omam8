@@ -1,0 +1,71 @@
+; assumes this is ran with --iodevice serial,0
+    jmp .main
+
+main:
+    ; set up serial ports
+    sio 2  ; 0b0010, pin 0 - CLK
+    sio 10 ; 0b1010, pin 2 - OUT
+
+    mov16 .hello, %ba
+    jmp .loop
+loop:
+    ; load %c from %ba, if it's 0 jump to the end
+    peek %ba, %c
+    eq 0, %c
+    jeq .end
+
+    ; push return addr to stack
+    mov16 .ret, %dc
+    push %c
+    push %d
+    ; load %c before jumping to putchar
+    peek %ba, %c
+    jmp .putchar
+ret:
+    add 1, %a ; increment lower byte of hello addr
+    jmp .loop ; keep the loop going baby
+
+
+putchar:
+    ; shift bytes of c out
+    ; for (int i = 7; i != 0; i--) __wio(c >> i, 2);
+    mov 7, %d
+    jmp .putchar_loop
+putchar_loop:
+    ; if d == 0, jump to end
+    eq 0, %d
+    jeq .putchar_end
+
+    push %c
+    shr %d, %c ; shift C to the right by D
+    and 1, %c ; and C with 0b1 to make sure it's actually 1 bit
+    wio %c, 2
+    ; pulse clock
+    mov 1, %c
+    wio %c, 0
+    mov 0, %c
+    wio %c, 0
+    pop %c
+
+    sub 1, %d
+    jmp .putchar_loop
+putchar_end:
+    ; write C's last bit
+    and 1, %c
+    wio %c, 2
+    ; pulse clock
+    mov 1, %c
+    wio %c, 0
+    mov 0, %c
+    wio %c, 0
+
+    clrcmp
+
+    ; return
+    pop %d
+    pop %c
+    jmp %dc
+
+end: hlt
+hello:
+    #asciiz "hello, omam8 world!"

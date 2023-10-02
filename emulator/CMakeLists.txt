@@ -4,9 +4,13 @@ project(omam8emu)
 find_package(boost_program_options REQUIRED)
 
 add_executable(${PROJECT_NAME}
-    src/main.cpp
     src/core.cpp
+    src/io.cpp
+    src/main.cpp
     src/rom.cpp
+
+    src/io/serial.cpp
+
     src/opcodes/io.cpp
     src/opcodes/jumps.cpp
     src/opcodes/math.cpp
