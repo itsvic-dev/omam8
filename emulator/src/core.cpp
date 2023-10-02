@@ -228,7 +228,7 @@ void omam8::Core::handle_opcode() {
     throw std::invalid_argument("opcode doesn't exist");
   EmuOpcode opcode = opcodes[static_cast<Opcode>(memory[pc])];
 #ifdef DEBUG
-  std::cout << opcode.displayName << "\n";
+  std::cerr << opcode.displayName << "\n";
 #endif
   opcode.handler(memory + pc + 1u);
   if (!opcode.manipulatesPC)
@@ -267,25 +267,25 @@ template <typename T> std::string int_to_hex(T i, int size) {
 }
 
 void print_state() {
-  std::cout << "PC: " << int_to_hex(get_combined_register(PC), 4) << "   ";
-  std::cout << "SP: " << int_to_hex(get_combined_register(SP), 4) << "\n";
-  std::cout << "A: " << int_to_hex(get_register(A), 2) << "      ";
-  std::cout << "C: " << int_to_hex(get_register(C), 2) << "\n";
-  std::cout << "B: " << int_to_hex(get_register(B), 2) << "      ";
-  std::cout << "D: " << int_to_hex(get_register(D), 2) << "      ";
-  std::cout << "Flags: " << (get_flag(CMP) ? 1 : 0) << (get_flag(CRY) ? 1 : 0)
+  std::cerr << "PC: " << int_to_hex(get_combined_register(PC), 4) << "   ";
+  std::cerr << "SP: " << int_to_hex(get_combined_register(SP), 4) << "\n";
+  std::cerr << "A: " << int_to_hex(get_register(A), 2) << "      ";
+  std::cerr << "C: " << int_to_hex(get_register(C), 2) << "\n";
+  std::cerr << "B: " << int_to_hex(get_register(B), 2) << "      ";
+  std::cerr << "D: " << int_to_hex(get_register(D), 2) << "      ";
+  std::cerr << "Flags: " << (get_flag(CMP) ? 1 : 0) << (get_flag(CRY) ? 1 : 0)
             << "\n";
-  std::cout << "IO: ";
+  std::cerr << "IO: ";
   for (int i = 0; i < 32; i++) {
-    std::cout << (io_pins[i] ? "1" : "0");
+    std::cerr << (io_pins[i] ? "1" : "0");
   }
-  std::cout << "\n";
-  std::cout << "    ";
+  std::cerr << "\n";
+  std::cerr << "    ";
   for (int i = 0; i < 32; i++) {
-    std::cout << (io_pin_modes[i] == OFF    ? "X"
+    std::cerr << (io_pin_modes[i] == OFF    ? "X"
                   : io_pin_modes[i] == READ ? "R"
                                             : "W");
   }
-  std::cout << "\n";
+  std::cerr << "\n";
 }
 #endif
