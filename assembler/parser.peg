@@ -12,7 +12,7 @@ Register <- '%' < ('ba' / 'dc' / 'sp' / 'pc' / 'a' / 'b' / 'c' / 'd') > { handle
 
 Address <- '[' NumberBase ']' { handle_address(yytext); }
 Number <- NumberBase { handle_number(yytext); }
-NumberBase <- < (('0x' [0-9a-fA-F]+) / [0-9]+) >
+NumberBase <- <(('0b' [01]+) / ('0x' [0-9a-fA-F]+) / [0-9]+)>
 
 LabelStart <- LabelBase ':' { handle_new_label(yytext); }
 LabelMention <- '.' LabelBase { handle_label_mention(yytext); }
