@@ -3,8 +3,8 @@
 
 main:
     ; set up serial ports
-    sio 0b0010, pin 0 - CLK, write mode
-    sio 0b1010, pin 2 - OUT, write mode
+    sio 0b0010 ; pin 0 - CLK, write mode
+    sio 0b1010 ; pin 2 - OUT, write mode
 
     mov16 .hello, %ba
     jmp .loop
