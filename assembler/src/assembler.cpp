@@ -318,12 +318,9 @@ void Assembler::build_intermediate_rom() {
         switch (arg->type) {
         case ArgType::NUMBER: {
           int value;
-          std::cout << "number: " << arg->contents << "\n";
           if (std::string(arg->contents).rfind("0b", 0) == 0) {
-            std::cout << "number starts with 0b\n";
             value = std::stoi(arg->contents.c_str() + 2, nullptr, 2);
           } else {
-            std::cout << "number doesn't start with 0b\n";
             value = std::stoi(arg->contents, nullptr, 0);
           }
           stage2_rom[label].push_back(static_cast<uint8_t>(value));
