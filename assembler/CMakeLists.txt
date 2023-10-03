@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(omam8asm)
+project(omam8asm VERSION 3.0.0)
 
 add_executable(${PROJECT_NAME}
     src/assembler.cpp

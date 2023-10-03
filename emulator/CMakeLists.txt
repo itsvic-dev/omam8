@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(omam8emu)
+project(omam8emu VERSION 3.0.0)
 
 find_package(boost_program_options REQUIRED)
 
