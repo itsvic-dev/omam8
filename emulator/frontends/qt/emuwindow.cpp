@@ -11,8 +11,8 @@ EmuWindow::EmuWindow(QWidget *parent)
 EmuWindow::~EmuWindow() { delete ui; }
 
 void EmuWindow::openROM() {
-  QString romToOpen =
-      QFileDialog::getOpenFileName(this, "Open ROM", "", "omam8 ROMs (*.rom)");
+  QString romToOpen = QFileDialog::getOpenFileName(this, tr("Open ROM"), "",
+                                                   tr("omam8 ROMs (*.rom)"));
 
   qDebug() << "rom to open:" << romToOpen;
 }

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>603</height>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,6 +33,12 @@
     <property name="title">
      <string>Docks</string>
     </property>
+    <addaction name="actionMemory_Viewer"/>
+    <addaction name="actionIO_Devices"/>
+    <addaction name="actionSerial_Output"/>
+    <addaction name="separator"/>
+    <addaction name="actionDebugLogs"/>
+    <addaction name="actionCPU_State"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDocks"/>
@@ -46,6 +52,49 @@
     <string>Ctrl+O</string>
    </property>
   </action>
+  <action name="actionMemory_Viewer">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Memory Viewer</string>
+   </property>
+  </action>
+  <action name="actionDebugLogs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug Logs</string>
+   </property>
+   <property name="toolTip">
+    <string>Emulator Logs</string>
+   </property>
+  </action>
+  <action name="actionSerial_Output">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Serial Output</string>
+   </property>
+  </action>
+  <action name="actionIO_Devices">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>IO Devices</string>
+   </property>
+  </action>
+  <action name="actionCPU_State">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>CPU State</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -56,8 +105,8 @@
    <slot>openROM()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>399</x>
-     <y>301</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
