@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmuWindow</class>
+ <widget class="QMainWindow" name="EmuWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>603</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>omam8emu</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen_ROM"/>
+   </widget>
+   <widget class="QMenu" name="menuDocks">
+    <property name="title">
+     <string>Docks</string>
+    </property>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuDocks"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpen_ROM">
+   <property name="text">
+    <string>Open ROM...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actionOpen_ROM</sender>
+   <signal>triggered()</signal>
+   <receiver>EmuWindow</receiver>
+   <slot>openROM()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>301</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>openROM()</slot>
+ </slots>
+</ui>

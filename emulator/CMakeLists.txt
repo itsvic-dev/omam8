@@ -27,4 +27,15 @@ target_link_libraries(${PROJECT_NAME}
     omam8-shared
 )
 
-add_subdirectory(frontends/cli)
+option(EMU_QT "Enable omam8emu's Qt frontend" OFF)
+option(EMU_CLI "Enable omam8emu's CLI frontend" ON)
+
+if (EMU_CLI)
+    message(STATUS "Building omam8emu-cli")
+    add_subdirectory(frontends/cli)
+endif()
+
+if (EMU_QT)
+    message(STATUS "Building omam8emu-qt")
+    add_subdirectory(frontends/qt)
+endif()
