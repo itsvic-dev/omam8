@@ -8,11 +8,11 @@ if (DEBUG)
     add_definitions(-DDEBUG -DYY_DEBUG)
 endif()
 
-include_directories(shared)
-
-set(SHARED_SRC
-    ${CMAKE_CURRENT_SOURCE_DIR}/shared/helpers.cpp
+add_library(omam8-shared STATIC
+    shared/helpers.cpp
 )
+
+target_include_directories(omam8-shared PUBLIC shared)
 
 add_subdirectory(emulator)
 add_subdirectory(assembler)
