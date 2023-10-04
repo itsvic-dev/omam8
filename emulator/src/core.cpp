@@ -238,12 +238,12 @@ void omam8::Core::handle_opcode() {
 
 void omam8::Core::start_loop() {
 #ifdef DEBUG
-  Platform::dumpCoreState();
+  Platform::dumpCoreState(io_pins, io_pin_modes);
 #endif
   while (cpu_running) {
     handle_opcode();
 #ifdef DEBUG
-    Platform::dumpCoreState();
+    Platform::dumpCoreState(io_pins, io_pin_modes);
 #endif
   }
 }
