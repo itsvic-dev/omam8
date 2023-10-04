@@ -1,6 +1,6 @@
 #include "io.h"
 #include "io/serial.h"
-#include <iostream>
+#include "platform.h"
 #include <map>
 
 namespace omam8::IOEmu {
@@ -39,8 +39,8 @@ void setIODevice(int pinStart, IODevice device) {
   }
 
 #ifdef DEBUG
-  std::cerr << "[IO] device " << device << " assigned to pin " << pinStart
-            << "\n";
+  Platform::debugConsolePrint("[IO] device %d assigned to pin %d", device,
+                              pinStart);
 #endif
 
   // reset devices_to_pins

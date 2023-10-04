@@ -1,11 +1,9 @@
 #include "helpers.h"
 #include "io.h"
+#include "platform.h"
 #include <core.h>
 #include <cstdlib>
 #include <cstring>
-#include <iomanip>
-#include <ios>
-#include <iostream>
 #include <map>
 #include <sstream>
 
@@ -174,8 +172,7 @@ uint8_t omam8::Core::get_mram(uint16_t addr) { return memory[addr]; }
 
 void omam8::Core::set_mram(uint16_t addr, uint8_t value) {
   if (addr >= 0x8000 && addr < 0xC000) {
-    std::cerr << "ignoring write to RAM address " << std::hex << addr
-              << std::endl;
+    Platform::debugConsolePrint("ignoring write to RAM address %#4x", addr);
     return;
   }
   if (addr >= 0xC000) {
@@ -232,25 +229,21 @@ void omam8::Core::handle_opcode() {
     throw std::invalid_argument("opcode doesn't exist");
   EmuOpcode opcode = opcodes[static_cast<Opcode>(memory[pc])];
 #ifdef DEBUG
-  std::cerr << opcode.displayName << "\n";
+  Platform::debugConsolePrint("%s", opcode.displayName.c_str());
 #endif
   opcode.handler(memory + pc + 1u);
   if (!opcode.manipulatesPC)
     registers_16b[Register::PC] = pc + 1u + opcode.argsLength;
 }
 
-#ifdef DEBUG
-void print_state();
-#endif
-
 void omam8::Core::start_loop() {
 #ifdef DEBUG
-  print_state();
+  Platform::dumpCoreState();
 #endif
   while (cpu_running) {
     handle_opcode();
 #ifdef DEBUG
-    print_state();
+    Platform::dumpCoreState();
 #endif
   }
 }
@@ -261,35 +254,3 @@ void omam8::Core::load_rom(omam8::ROM::ROMData rom) {
 }
 
 void omam8::Core::halt_cpu() { cpu_running = false; }
-
-#ifdef DEBUG
-template <typename T> std::string int_to_hex(T i, int size) {
-  std::stringstream stream;
-  stream << "0x" << std::setfill('0') << std::setw(size) << std::hex
-         << static_cast<int>(i);
-  return stream.str();
-}
-
-void print_state() {
-  std::cerr << "PC: " << int_to_hex(get_combined_register(PC), 4) << "   ";
-  std::cerr << "SP: " << int_to_hex(get_combined_register(SP), 4) << "\n";
-  std::cerr << "A: " << int_to_hex(get_register(A), 2) << "      ";
-  std::cerr << "C: " << int_to_hex(get_register(C), 2) << "\n";
-  std::cerr << "B: " << int_to_hex(get_register(B), 2) << "      ";
-  std::cerr << "D: " << int_to_hex(get_register(D), 2) << "      ";
-  std::cerr << "Flags: " << (get_flag(CMP) ? 1 : 0) << (get_flag(CRY) ? 1 : 0)
-            << "\n";
-  std::cerr << "IO: ";
-  for (int i = 0; i < 32; i++) {
-    std::cerr << (io_pins[i] ? "1" : "0");
-  }
-  std::cerr << "\n";
-  std::cerr << "    ";
-  for (int i = 0; i < 32; i++) {
-    std::cerr << (io_pin_modes[i] == OFF    ? "X"
-                  : io_pin_modes[i] == READ ? "R"
-                                            : "W");
-  }
-  std::cerr << "\n";
-}
-#endif
