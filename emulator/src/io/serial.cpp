@@ -1,7 +1,6 @@
 #include "io/serial.h"
 #include "io.h"
-#include <cstdio>
-#include <iostream>
+#include "platform.h"
 
 namespace omam8::IOEmu::Serial {
 
@@ -14,7 +13,8 @@ void handleClockPulse() {
 
   if (known_pin_states[clkPin]) {
 #ifdef DEBUG
-    std::cerr << "[SERIAL] clock pulsed\n";
+    // std::cerr << "[SERIAL] clock pulsed\n";
+    Platform::debugConsolePrint("[SERIAL] clock pulsed");
 #endif
 
     // push the outPin's content into outBuf
@@ -24,7 +24,7 @@ void handleClockPulse() {
 
     // if outBufBits==8, putchar
     if (outBufBits == 8) {
-      putchar(outBuf);
+      Platform::serialPut(outBuf);
       outBuf = 0;
       outBufBits = 0;
     }
